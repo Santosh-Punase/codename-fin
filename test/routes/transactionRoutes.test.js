@@ -1,14 +1,14 @@
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
-import { server, expect } from './server.js';
+import { server, expect } from '../server.js';
 
-import app from '../src/app.js';
-import User from '../src/models/User.js';
-import Transaction from '../src/models/Transaction.js';
+import app from '../../src/app.js';
+import User from '../../src/models/User.js';
+import Transaction from '../../src/models/Transaction.js';
 import {
   JWT_SECRET, JWT_EXPIRY, DB_URI_TEST, TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_PASSWORD,
-} from '../src/config/env.js';
+} from '../../src/config/env.js';
 
 let token;
 let userId;

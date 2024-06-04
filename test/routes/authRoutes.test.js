@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
-import { server, expect } from './server.js';
-import app from '../src/app.js'; // Ensure server exports your app instance
-import User from '../src/models/User.js';
-import { TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_PASSWORD } from '../src/config/env.js';
+import { server, expect } from '../server.js';
+import app from '../../src/app.js'; // Ensure server exports your app instance
+import User from '../../src/models/User.js';
+import { TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_PASSWORD } from '../../src/config/env.js';
 
 describe('Auth Routes', () => {
   after(async () => {

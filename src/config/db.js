@@ -1,8 +1,11 @@
 import mongoose from 'mongoose';
-import { DB_URI, DB_URI_TEST, NODE_ENV } from './env.js';
+
+import { DB_URI, DB_URI_TEST } from './env.js';
+import { isTestEnv } from '../utils/index.js';
 
 const connectDB = async () => {
-  const URI = NODE_ENV === 'test' ? DB_URI_TEST : DB_URI;
+  const URI = isTestEnv() ? DB_URI_TEST : DB_URI;
+
   try {
     await mongoose.connect(URI);
     console.log('MongoDB connected...');
