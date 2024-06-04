@@ -6,8 +6,12 @@ import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import errorHandler from './utils/errorHandler.js';
+import limiter from './middleware/rateLimiter.js';
 
 const app = express();
+
+// Rate Limiting
+app.use(limiter());
 
 // Security Headers
 app.use(helmet());

@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+import { SALT_ROUND } from '../config/contants.js';
+
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -21,7 +23,7 @@ UserSchema.pre('save', async function encrypt(next) {
   if (!this.isModified('password')) {
     return next();
   }
-  const salt = await bcrypt.genSalt(10);
+  const salt = await bcrypt.genSalt(SALT_ROUND);
   this.password = await bcrypt.hash(this.password, salt);
   return next();
 });
