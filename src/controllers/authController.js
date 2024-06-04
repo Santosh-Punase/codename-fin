@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
+
 import User from '../models/User.js';
+
 import { JWT_SECRET, JWT_EXPIRY } from '../config/env.js';
+import logger from '../utils/logger.js';
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -11,6 +14,7 @@ export const register = async (req, res) => {
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY || '1h' });
     return res.status(201).json({ token });
   } catch (err) {
+    logger.error(`Unable to register a user ${email} : ${err}`);
     return res.status(500).json({ error: { code: err.code, message: err.message } });
   }
 };

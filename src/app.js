@@ -1,4 +1,7 @@
 import express from 'express';
+import helmet from 'helmet';
+// import cors from 'cors';
+
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
@@ -6,10 +9,20 @@ import errorHandler from './utils/errorHandler.js';
 
 const app = express();
 
+// Security Headers
+app.use(helmet());
+
+// CORS
+// const corsOptions = {
+//   origin: 'http://example.com', // Replace with your domain
+//   optionsSuccessStatus: 200,
+// };
+// app.use(cors(corsOptions));
+
 // Connect to database
 connectDB();
 
-// Middleware
+// Body Parser Middleware
 app.use(express.json());
 
 // Routes
