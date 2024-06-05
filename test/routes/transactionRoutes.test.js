@@ -51,6 +51,48 @@ describe('Transaction Routes', () => {
           done();
         });
     });
+
+    it('should Not add a new transaction with invalid amount', (done) => {
+      server.request(app)
+        .post('/api/transactions')
+        .set('Authorization', token)
+        .send({
+          remark: 'Test transaction',
+          category: 'Food',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          done();
+        });
+    });
+
+    it('should Not add a new transaction with invalid remark', (done) => {
+      server.request(app)
+        .post('/api/transactions')
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          category: 'Food',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          done();
+        });
+    });
+
+    it('should Not add a new transaction with invalid category', (done) => {
+      server.request(app)
+        .post('/api/transactions')
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          remark: 'Test transaction',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          done();
+        });
+    });
   });
 
   describe('PUT /api/transactions/:id', () => {
@@ -82,6 +124,51 @@ describe('Transaction Routes', () => {
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('amount', 200);
           expect(res.body).to.have.property('remark', 'Updated transaction');
+          done();
+        });
+    });
+
+    it('should Not edit a transaction with invalid amount', (done) => {
+      server.request(app)
+        .put(`/api/transactions/${transactionId}`)
+        .set('Authorization', token)
+        .send({
+          amount: 'invalid',
+          remark: 'Test transaction',
+          category: 'Food',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          done();
+        });
+    });
+
+    it('should Not edit a transaction with invalid remark', (done) => {
+      server.request(app)
+        .put(`/api/transactions/${transactionId}`)
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          remark: '',
+          category: 'Food',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          done();
+        });
+    });
+
+    it('should Not edit a transaction with invalid category', (done) => {
+      server.request(app)
+        .put(`/api/transactions/${transactionId}`)
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          remark: 'Test transaction',
+          category: '',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
           done();
         });
     });

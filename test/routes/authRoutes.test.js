@@ -20,10 +20,56 @@ describe('Auth Routes', () => {
           username: TEST_USER_NAME,
           email: TEST_USER_EMAIL,
           password: TEST_USER_PASSWORD,
+          confirmPassword: TEST_USER_PASSWORD,
         })
         .end((err, res) => {
           expect(res).to.have.status(201);
           expect(res.body).to.have.property('token');
+          done();
+        });
+    });
+
+    it('should not register a new user with invalid email', (done) => {
+      server.request(app)
+        .post('/api/auth/register')
+        .send({
+          username: TEST_USER_NAME,
+          email: 'TEST_USER_EMAIL',
+          password: TEST_USER_PASSWORD,
+          confirmPassword: TEST_USER_PASSWORD,
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          done();
+        });
+    });
+
+    it('should not register a new user with invalid password', (done) => {
+      server.request(app)
+        .post('/api/auth/register')
+        .send({
+          username: TEST_USER_NAME,
+          email: TEST_USER_EMAIL,
+          password: 'pass',
+          confirmPassword: 'pass',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          done();
+        });
+    });
+
+    it('should not register a new user with invalid confirmPassword', (done) => {
+      server.request(app)
+        .post('/api/auth/register')
+        .send({
+          username: TEST_USER_NAME,
+          email: TEST_USER_EMAIL,
+          password: TEST_USER_PASSWORD,
+          confirmPassword: 'password',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
           done();
         });
     });
