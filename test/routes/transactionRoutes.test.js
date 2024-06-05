@@ -9,6 +9,8 @@ import Transaction from '../../src/models/Transaction.js';
 import {
   JWT_SECRET, JWT_EXPIRY, DB_URI_TEST, TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_PASSWORD,
 } from '../../src/config/env.js';
+import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
+import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
 
 let token;
 let userId;
@@ -52,7 +54,7 @@ describe('Transaction Routes', () => {
         });
     });
 
-    it('should Not add a new transaction with invalid amount', (done) => {
+    it('should Not add a new transaction without amount', (done) => {
       server.request(app)
         .post('/api/transactions')
         .set('Authorization', token)
@@ -62,11 +64,13 @@ describe('Transaction Routes', () => {
         })
         .end((err, res) => {
           expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.AMOUNT_IS_REQUIRED);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_AMOUNT);
           done();
         });
     });
 
-    it('should Not add a new transaction with invalid remark', (done) => {
+    it('should Not add a new transaction without remark', (done) => {
       server.request(app)
         .post('/api/transactions')
         .set('Authorization', token)
@@ -76,11 +80,13 @@ describe('Transaction Routes', () => {
         })
         .end((err, res) => {
           expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.REMARK_IS_REQUIRED);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
           done();
         });
     });
 
-    it('should Not add a new transaction with invalid category', (done) => {
+    it('should Not add a new transaction without category', (done) => {
       server.request(app)
         .post('/api/transactions')
         .set('Authorization', token)
@@ -90,6 +96,76 @@ describe('Transaction Routes', () => {
         })
         .end((err, res) => {
           expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.CATEGORY_IS_REQUIRED);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
+          done();
+        });
+    });
+
+    it('should Not add a new transaction with empty remark', (done) => {
+      server.request(app)
+        .post('/api/transactions')
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          remark: '',
+          category: 'Food',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_REMARK);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
+          done();
+        });
+    });
+
+    it('should Not add a new transaction with empty category', (done) => {
+      server.request(app)
+        .post('/api/transactions')
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          remark: 'Test transaction',
+          category: '',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_CATEGORY);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
+          done();
+        });
+    });
+
+    it('should Not add a new transaction with false empty remark', (done) => {
+      server.request(app)
+        .post('/api/transactions')
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          remark: ' ',
+          category: 'Food',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_REMARK);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
+          done();
+        });
+    });
+
+    it('should Not add a new transaction with false empty category', (done) => {
+      server.request(app)
+        .post('/api/transactions')
+        .set('Authorization', token)
+        .send({
+          amount: 100,
+          remark: 'Test transaction',
+          category: '  ',
+        })
+        .end((err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_CATEGORY);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
           done();
         });
     });
@@ -139,6 +215,8 @@ describe('Transaction Routes', () => {
         })
         .end((err, res) => {
           expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_AMOUNT);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_AMOUNT);
           done();
         });
     });
@@ -149,11 +227,13 @@ describe('Transaction Routes', () => {
         .set('Authorization', token)
         .send({
           amount: 100,
-          remark: '',
+          remark: 65,
           category: 'Food',
         })
         .end((err, res) => {
           expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_REMARK);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
           done();
         });
     });
@@ -165,10 +245,12 @@ describe('Transaction Routes', () => {
         .send({
           amount: 100,
           remark: 'Test transaction',
-          category: '',
+          category: 45,
         })
         .end((err, res) => {
           expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_CATEGORY);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
           done();
         });
     });

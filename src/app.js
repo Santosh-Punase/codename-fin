@@ -5,7 +5,6 @@ import helmet from 'helmet';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
-import errorHandler from './utils/errorHandler.js';
 import limiter from './middleware/rateLimiter.js';
 
 const app = express();
@@ -32,8 +31,5 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
-
-// Error Handler
-app.use(errorHandler);
 
 export default app;
