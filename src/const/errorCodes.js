@@ -14,5 +14,8 @@ const VALIDATION_ERROR_CODES = {
   INVALID_CATEGORY: 20031,
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { VALIDATION_ERROR_CODES };
+const ERROR_CODES = {
+  NOT_AUTHORIZED: 40010,
+};
+
+export { VALIDATION_ERROR_CODES, ERROR_CODES };

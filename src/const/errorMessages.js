@@ -11,5 +11,8 @@ const VALIDATION_ERROR = {
   INVALID_CATEGORY: 'Please Enter a valid Category',
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export { VALIDATION_ERROR };
+const ERROR = {
+  NOT_AUTHORIZED: 'Not authorized',
+};
+
+export { VALIDATION_ERROR, ERROR };
