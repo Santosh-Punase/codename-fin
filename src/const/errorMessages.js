@@ -12,6 +12,7 @@ const VALIDATION_ERROR = {
 };
 
 const ERROR = {
+  INVALID_CREDENTIALS: 'Invalid credentials',
   NOT_AUTHORIZED: 'Not authorized',
 };
 
