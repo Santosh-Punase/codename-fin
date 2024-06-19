@@ -11,6 +11,7 @@ import {
 } from '../../src/config/env.js';
 import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
 import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
+import { TOKEN_VARIABLE } from '../../src/config/contants.js';
 
 let token;
 let userId;
@@ -26,7 +27,7 @@ describe('Transaction Routes', () => {
     });
     await user.save();
     userId = user._id;
-    token = `Bearer ${jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY })}`;
+    token = `${jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY })}`;
   });
 
   after(async () => {
@@ -39,7 +40,7 @@ describe('Transaction Routes', () => {
     it('should add a new transaction', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: 'Test transaction',
@@ -57,7 +58,7 @@ describe('Transaction Routes', () => {
     it('should Not add a new transaction without amount', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           remark: 'Test transaction',
           category: 'Food',
@@ -73,7 +74,7 @@ describe('Transaction Routes', () => {
     it('should Not add a new transaction without remark', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           category: 'Food',
@@ -89,7 +90,7 @@ describe('Transaction Routes', () => {
     it('should Not add a new transaction without category', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: 'Test transaction',
@@ -105,7 +106,7 @@ describe('Transaction Routes', () => {
     it('should Not add a new transaction with empty remark', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: '',
@@ -122,7 +123,7 @@ describe('Transaction Routes', () => {
     it('should Not add a new transaction with empty category', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: 'Test transaction',
@@ -139,7 +140,7 @@ describe('Transaction Routes', () => {
     it('should Not add a new transaction with false empty remark', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: ' ',
@@ -156,7 +157,7 @@ describe('Transaction Routes', () => {
     it('should Not add a new transaction with false empty category', (done) => {
       server.request(app)
         .post('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: 'Test transaction',
@@ -189,7 +190,7 @@ describe('Transaction Routes', () => {
     it('should edit an existing transaction', (done) => {
       server.request(app)
         .put(`/api/transactions/${transactionId}`)
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 200,
           remark: 'Updated transaction',
@@ -207,7 +208,7 @@ describe('Transaction Routes', () => {
     it('should Not edit a transaction with invalid amount', (done) => {
       server.request(app)
         .put(`/api/transactions/${transactionId}`)
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 'invalid',
           remark: 'Test transaction',
@@ -224,7 +225,7 @@ describe('Transaction Routes', () => {
     it('should Not edit a transaction with invalid remark', (done) => {
       server.request(app)
         .put(`/api/transactions/${transactionId}`)
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: 65,
@@ -241,7 +242,7 @@ describe('Transaction Routes', () => {
     it('should Not edit a transaction with invalid category', (done) => {
       server.request(app)
         .put(`/api/transactions/${transactionId}`)
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .send({
           amount: 100,
           remark: 'Test transaction',
@@ -260,7 +261,7 @@ describe('Transaction Routes', () => {
     it('should get all transactions for the user', (done) => {
       server.request(app)
         .get('/api/transactions')
-        .set('Authorization', token)
+        .set('cookie', `${TOKEN_VARIABLE}=${token}`)
         .end((err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an('array');

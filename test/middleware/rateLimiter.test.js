@@ -17,7 +17,7 @@ describe('Rate Limiter Middleware', () => {
       res.status(200).send('Hello, world!');
     });
 
-    appServer = app.listen(3000);
+    appServer = app.listen(3052);
   });
 
   after(() => {

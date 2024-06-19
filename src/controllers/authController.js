@@ -5,6 +5,7 @@ import { JWT_SECRET, JWT_EXPIRY } from '../config/env.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
+import { serializeCookie } from '../utils/cookies.js';
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -14,7 +15,8 @@ export const register = async (req, res) => {
     await user.save();
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY || '1h' });
     logger.info(`New user created ${email}`);
-    return res.status(201).json({ token });
+    res.setHeader('Set-Cookie', serializeCookie(token));
+    return res.status(201).json({ message: 'Signup successful' });
   } catch (err) {
     logger.error(`Unable to register a user ${email}: ${err}`);
     return res.status(500).json({ error: { code: err.code, message: err.message } });
@@ -34,7 +36,8 @@ export const login = async (req, res) => {
         });
     }
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY || '1h' });
-    return res.status(200).json({ token });
+    res.setHeader('Set-Cookie', serializeCookie(token));
+    return res.status(200).json({ message: 'Login successful' });
   } catch (err) {
     logger.error(`Unable to Login a user ${email}: ${err}`);
     return res.status(500).json({ error: { code: err.code, message: err.message } });

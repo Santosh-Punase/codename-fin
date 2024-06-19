@@ -27,6 +27,7 @@ describe('Auth Controller', () => {
       },
     };
     response = {
+      setHeader: sinon.stub(),
       status: sinon.stub().returnsThis(),
       json: sinon.stub().returnsThis(),
     };
@@ -50,8 +51,9 @@ describe('Auth Controller', () => {
       expect(jwtStub).to.have.been
         .calledWith({ id: sinon.match.any }, JWT_SECRET, { expiresIn: '1h' });
       expect(logger.info).to.have.been.calledWith(`New user created ${request.body.email}`);
+      expect(response.setHeader).to.have.been.calledWith('Set-Cookie');
       expect(response.status).to.have.been.calledWith(201);
-      expect(response.json).to.have.been.calledWith({ token: 'validToken' });
+      expect(response.json).to.have.been.calledWith({ message: 'Signup successful' });
     });
 
     it('should return 500 if there is an error during registration', async () => {
@@ -92,8 +94,9 @@ describe('Auth Controller', () => {
       expect(mockUser.matchPassword).to.have.been.calledWith(request.body.password);
       expect(jwtStub).to.have.been
         .calledWith({ id: mockUser._id }, JWT_SECRET, { expiresIn: '1h' });
+      expect(response.setHeader).to.have.been.calledWith('Set-Cookie');
       expect(response.status).to.have.been.calledWith(200);
-      expect(response.json).to.have.been.calledWith({ token: 'validToken' });
+      expect(response.json).to.have.been.calledWith({ message: 'Login successful' });
     });
 
     it('should return 401 if credentials are invalid', async () => {

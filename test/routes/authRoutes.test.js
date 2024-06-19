@@ -77,7 +77,7 @@ describe('Auth Routes', () => {
         })
         .end((err, res) => {
           expect(res).to.have.status(201);
-          expect(res.body).to.have.property('token');
+          expect(res.body).to.have.property('message');
           done();
         });
     });
@@ -110,7 +110,7 @@ describe('Auth Routes', () => {
         })
         .end((err, res) => {
           expect(res).to.have.status(200);
-          expect(res.body).to.have.property('token');
+          expect(res.body).to.have.property('message');
           done();
         });
     });

@@ -9,6 +9,7 @@ import User from '../../src/models/User.js';
 import { JWT_SECRET } from '../../src/config/env.js';
 import { ERROR_CODES } from '../../src/const/errorCodes.js';
 import { ERROR } from '../../src/const/errorMessages.js';
+import { TOKEN_VARIABLE } from '../../src/config/contants.js';
 
 use(sinonChai);
 
@@ -19,7 +20,7 @@ describe('authentication middleware', () => {
   beforeEach(() => {
     request = {
       headers: {
-        authorization: 'Bearer validtoken',
+        cookie: `${TOKEN_VARIABLE}=validtoken`,
       },
     };
     response = {
@@ -36,7 +37,7 @@ describe('authentication middleware', () => {
   });
 
   it('should return 401 if no token is provided', async () => {
-    request.headers.authorization = null;
+    request.headers.cookie = null;
 
     await protect(request, response, next);
 

@@ -6,3 +6,7 @@ export const RATE_LIMIT_CONFIG = {
   MAX_REQUEST_TEST: 1,
   MESSAGE: 'Too many requests from this IP, please try again later.',
 };
+
+export const TOKEN_VARIABLE = 'at';
+
+export const TOKEN_COOKIE_MAX_AGE = 3600;
