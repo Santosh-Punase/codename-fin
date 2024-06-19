@@ -1,11 +1,12 @@
 import express from 'express';
 import helmet from 'helmet';
-// import cors from 'cors';
+import cors from 'cors';
 
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import limiter from './middleware/rateLimiter.js';
+import { CORS_DOMAIN } from './config/env.js';
 
 const app = express();
 
@@ -16,11 +17,11 @@ app.use(limiter());
 app.use(helmet());
 
 // CORS
-// const corsOptions = {
-//   origin: 'http://example.com', // Replace with your domain
-//   optionsSuccessStatus: 200,
-// };
-// app.use(cors(corsOptions));
+const corsOptions = {
+  origin: CORS_DOMAIN,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 
 // Connect to database
 connectDB();

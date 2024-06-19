@@ -7,7 +7,7 @@ const connectDB = async () => {
   const URI = isTestEnv() ? DB_URI_TEST : DB_URI;
 
   try {
-    await mongoose.connect(URI);
+    await mongoose.connect(URI, { ssl: true });
     console.log('MongoDB connected...');
   } catch (err) {
     console.error('error', err.message);

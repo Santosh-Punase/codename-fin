@@ -11,3 +11,4 @@ export const { PORT } = process.env;
 export const { TEST_USER_NAME } = process.env;
 export const { TEST_USER_EMAIL } = process.env;
 export const { TEST_USER_PASSWORD } = process.env;
+export const { CORS_DOMAIN } = process.env;
