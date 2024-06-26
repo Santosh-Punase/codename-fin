@@ -3,6 +3,7 @@ import sinonChai from 'sinon-chai';
 import { expect, use } from 'chai';
 
 import Transaction from '../../src/models/Transaction.js';
+import Category from '../../src/models/Category.js';
 import logger from '../../src/utils/logger.js';
 import { ERROR_CODES } from '../../src/const/errorCodes.js';
 import { ERROR } from '../../src/const/errorMessages.js';
@@ -16,17 +17,28 @@ const mockUser = { id: '123' };
 const mockTransaction = {
   amount: 100,
   remark: 'Test',
-  category: 'Food',
+  type: 'expense',
+  category: '60d21b4667d0d8992e610c85',
   date: '2024-06-07',
   user: mockUser.id,
+};
+
+const mockCategory = {
+  user: mockUser.id,
+  name: 'Entertainment',
+  budget: 500,
+  expenditure: 0,
 };
 
 describe('Transaction Controller', () => {
   let request;
   let response;
-  let saveStub;
-  let findStub;
-  let findByIdStub;
+  let saveTransactionStub;
+  let saveCategoryStub;
+  let findTransactionStub;
+  let findOneCategoryStub;
+  let findTransactionByIdStub;
+  let findCategoryByIdStub;
   let deleteOneStub;
 
   beforeEach(() => {
@@ -40,9 +52,12 @@ describe('Transaction Controller', () => {
     };
     sinon.stub(logger, 'info');
     sinon.stub(logger, 'error');
-    saveStub = sinon.stub(Transaction.prototype, 'save');
-    findStub = sinon.stub(Transaction, 'find');
-    findByIdStub = sinon.stub(Transaction, 'findById');
+    saveTransactionStub = sinon.stub(Transaction.prototype, 'save');
+    saveCategoryStub = sinon.stub();
+    findTransactionStub = sinon.stub(Transaction, 'find');
+    findOneCategoryStub = sinon.stub(Category, 'findOne');
+    findTransactionByIdStub = sinon.stub(Transaction, 'findById');
+    findCategoryByIdStub = sinon.stub(Category, 'findById');
     deleteOneStub = sinon.stub(Transaction.prototype, 'deleteOne');
   });
 
@@ -53,7 +68,9 @@ describe('Transaction Controller', () => {
   describe('addTransaction', () => {
     it('should add a transaction and return 201', async () => {
       const mockResponse = { ...mockTransaction, _id: mockUser.id };
-      saveStub.resolves(mockResponse);
+      findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      saveTransactionStub.resolves(mockResponse);
+      saveCategoryStub.resolves(mockCategory);
       response.json.returns(mockResponse);
 
       const res = await addTransaction(request, response);
@@ -62,8 +79,30 @@ describe('Transaction Controller', () => {
       expect(res).to.have.keys(Object.keys(mockResponse));
     });
 
+    it('should return 404 if there is no category associated', async () => {
+      const mockResponse = { ...mockTransaction, _id: mockUser.id };
+      findOneCategoryStub.resolves(null);
+      saveTransactionStub.resolves(mockResponse);
+      saveCategoryStub.resolves(mockCategory);
+      response.json.returns(mockResponse);
+
+      await addTransaction(request, response);
+
+      expect(response.status).to.have.been.calledWith(404);
+      expect(logger.error).to.have.been
+        .calledWith(
+          // eslint-disable-next-line max-len
+          `Unable to add transaction for user: ${mockUser.id}, category not found: ${mockTransaction.category}`,
+        );
+      expect(response.json).to.have.been.calledWith({
+        error: { code: ERROR_CODES.CATEGORY_NOT_FOUND, message: ERROR.CATEGORY_NOT_FOUND },
+      });
+    });
+
     it('should return 500 if there is an error', async () => {
-      saveStub.rejects(new Error('Database error'));
+      findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      saveCategoryStub.resolves(mockCategory);
+      saveTransactionStub.rejects(new Error('Database error'));
       response.json.returns(new Error('Database error'));
 
       await addTransaction(request, response);
@@ -87,7 +126,7 @@ describe('Transaction Controller', () => {
         date: '2024-06-07',
         user: mockUser.id,
       }];
-      findStub.resolves(mockTransactions);
+      findTransactionStub.resolves(mockTransactions);
       response.json.returns(mockTransactions);
 
       await getTransactions(request, response);
@@ -97,7 +136,7 @@ describe('Transaction Controller', () => {
     });
 
     it('should return 500 if there is an error', async () => {
-      findStub.rejects(new Error('Database error'));
+      findTransactionStub.rejects(new Error('Database error'));
 
       await getTransactions(request, response);
 
@@ -125,18 +164,22 @@ describe('Transaction Controller', () => {
       params: { id: transaction._id },
     };
 
-    it.skip('should update a transaction and return 200', async () => {
-      findByIdStub.resolves(transaction);
+    it('should update a transaction and return 200', async () => {
+      const saveTransaction = sinon.stub();
+      findTransactionByIdStub.resolves({ ...transaction, save: saveTransaction });
+      findCategoryByIdStub.resolves({ ...mockCategory, save: saveCategoryStub });
       const mockResponse = { ...mockTransaction, _id: mockUser.id };
-      saveStub.resolves(mockResponse);
+      saveTransactionStub.resolves(mockResponse);
 
       await updateTransaction(updateRequest, response);
 
       expect(response.status).to.have.been.calledWith(200);
+      expect(saveCategoryStub).to.have.been.calledBefore(saveTransaction);
+      expect(saveCategoryStub).to.have.been.calledAfter(saveTransaction);
     });
 
     it('should return 404 if transaction not found', async () => {
-      findByIdStub.resolves(null);
+      findTransactionByIdStub.resolves(null);
       const id = transaction._id;
 
       await updateTransaction(updateRequest, response);
@@ -157,7 +200,7 @@ describe('Transaction Controller', () => {
     it('should return 401 if unauthorized', async () => {
       const userId = '456';
       const { id } = updateRequest.params;
-      findByIdStub.resolves(transaction);
+      findTransactionByIdStub.resolves(transaction);
 
       await updateTransaction({ ...updateRequest, user: { id: userId } }, response);
 
@@ -175,7 +218,7 @@ describe('Transaction Controller', () => {
     });
 
     it('should return 500 if there is an error', async () => {
-      findByIdStub.rejects(new Error('Database error'));
+      findTransactionByIdStub.rejects(new Error('Database error'));
       const id = transaction._id;
 
       await updateTransaction(updateRequest, response);
@@ -208,17 +251,20 @@ describe('Transaction Controller', () => {
       user: mockUser,
       params: { id: transaction._id },
     };
-    it.skip('should delete a transaction and return 200', async () => {
-      findByIdStub.resolves({ ...mockTransaction, user: mockTransaction.user.id });
+    it('should delete a transaction and return 200', async () => {
+      const deleteOne = sinon.stub();
+      findTransactionByIdStub.resolves({ ...mockTransaction, deleteOne });
+      findCategoryByIdStub.resolves({ ...mockCategory, save: saveCategoryStub });
       deleteOneStub.resolves();
 
       await deleteTransaction(deleteRequest, response);
 
       expect(response.status).to.have.been.calledWith(200);
+      expect(saveCategoryStub).to.have.been.calledBefore(deleteOne);
     });
 
     it('should return 404 if transaction not found', async () => {
-      findByIdStub.resolves(null);
+      findTransactionByIdStub.resolves(null);
       const id = transaction._id;
 
       await deleteTransaction(deleteRequest, response);
@@ -239,7 +285,7 @@ describe('Transaction Controller', () => {
     it('should return 401 if unauthorized', async () => {
       const userId = '456';
       const { id } = deleteRequest.params;
-      findByIdStub.resolves(transaction);
+      findTransactionByIdStub.resolves(transaction);
 
       await deleteTransaction({ ...deleteRequest, user: { id: userId } }, response);
 
@@ -257,7 +303,7 @@ describe('Transaction Controller', () => {
     });
 
     it('should return 500 if there is an error', async () => {
-      findByIdStub.rejects(new Error('Database error'));
+      findTransactionByIdStub.rejects(new Error('Database error'));
       const id = transaction._id;
 
       await deleteTransaction(deleteRequest, response);

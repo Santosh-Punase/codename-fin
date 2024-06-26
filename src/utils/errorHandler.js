@@ -49,6 +49,31 @@ const transactionErrorHandler = (error) => {
         code: error.msg,
         message: VALIDATION_ERROR.INVALID_CATEGORY,
       });
+    case 'type':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_TRANSACTION_TYPE,
+      });
+    default:
+      return ({
+        code: VALIDATION_ERROR_CODES.DEFAULT,
+        message: VALIDATION_ERROR.DEFAULT,
+      });
+  }
+};
+
+const categoryErrorHandler = (error) => {
+  switch (error.path) {
+    case 'name':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_CATEGORY_NAME,
+      });
+    case 'budget':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_BUDGET,
+      });
     default:
       return ({
         code: VALIDATION_ERROR_CODES.DEFAULT,
@@ -60,4 +85,5 @@ const transactionErrorHandler = (error) => {
 export {
   userErrorHandler,
   transactionErrorHandler,
+  categoryErrorHandler,
 };

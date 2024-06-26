@@ -6,3 +6,10 @@ export const RATE_LIMIT_CONFIG = {
   MAX_REQUEST_TEST: 1,
   MESSAGE: 'Too many requests from this IP, please try again later.',
 };
+
+export const TRANSACTION_TYPE = {
+  INCOME: 'income',
+  EXPENSE: 'expense',
+};
+
+export const TRANSACTION_TYPES = [TRANSACTION_TYPE.INCOME, TRANSACTION_TYPE.EXPENSE];

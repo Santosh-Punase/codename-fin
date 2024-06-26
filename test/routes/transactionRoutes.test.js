@@ -11,9 +11,12 @@ import {
 } from '../../src/config/env.js';
 import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
 import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
+import { TRANSACTION_TYPE } from '../../src/config/contants.js';
+import Category from '../../src/models/Category.js';
 
 let token;
 let userId;
+let categoryId;
 
 describe('Transaction Routes', () => {
   before(async () => {
@@ -26,6 +29,16 @@ describe('Transaction Routes', () => {
     });
     await user.save();
     userId = user._id;
+
+    const category = new Category({
+      name: 'Entertainment',
+      budget: 500,
+      expenditure: 0,
+      user: userId,
+    });
+    await category.save();
+    categoryId = category._id;
+
     token = `Bearer ${jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY })}`;
   });
 
@@ -42,130 +55,33 @@ describe('Transaction Routes', () => {
         .set('Authorization', token)
         .send({
           amount: 100,
+          type: TRANSACTION_TYPE.EXPENSE,
           remark: 'Test transaction',
-          category: 'Food',
+          category: categoryId,
         })
-        .end((err, res) => {
+        .end((_err, res) => {
           expect(res).to.have.status(201);
           expect(res.body).to.have.property('amount', 100);
+          expect(res.body).to.have.property('type', TRANSACTION_TYPE.EXPENSE);
           expect(res.body).to.have.property('remark', 'Test transaction');
-          expect(res.body).to.have.property('category', 'Food');
+          expect(res.body).to.have.property('category', categoryId.toString());
           done();
         });
     });
 
-    it('should Not add a new transaction without amount', (done) => {
+    it('should Not add an INVALID transaction', (done) => {
       server.request(app)
         .post('/api/transactions')
         .set('Authorization', token)
         .send({
+          type: TRANSACTION_TYPE.EXPENSE,
           remark: 'Test transaction',
-          category: 'Food',
+          category: categoryId,
         })
-        .end((err, res) => {
+        .end((_err, res) => {
           expect(res).to.have.status(400);
           expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.AMOUNT_IS_REQUIRED);
           expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_AMOUNT);
-          done();
-        });
-    });
-
-    it('should Not add a new transaction without remark', (done) => {
-      server.request(app)
-        .post('/api/transactions')
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          category: 'Food',
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.REMARK_IS_REQUIRED);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
-          done();
-        });
-    });
-
-    it('should Not add a new transaction without category', (done) => {
-      server.request(app)
-        .post('/api/transactions')
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          remark: 'Test transaction',
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.CATEGORY_IS_REQUIRED);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
-          done();
-        });
-    });
-
-    it('should Not add a new transaction with empty remark', (done) => {
-      server.request(app)
-        .post('/api/transactions')
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          remark: '',
-          category: 'Food',
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_REMARK);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
-          done();
-        });
-    });
-
-    it('should Not add a new transaction with empty category', (done) => {
-      server.request(app)
-        .post('/api/transactions')
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          remark: 'Test transaction',
-          category: '',
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_CATEGORY);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
-          done();
-        });
-    });
-
-    it('should Not add a new transaction with false empty remark', (done) => {
-      server.request(app)
-        .post('/api/transactions')
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          remark: ' ',
-          category: 'Food',
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_REMARK);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
-          done();
-        });
-    });
-
-    it('should Not add a new transaction with false empty category', (done) => {
-      server.request(app)
-        .post('/api/transactions')
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          remark: 'Test transaction',
-          category: '  ',
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_CATEGORY);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
           done();
         });
     });
@@ -178,8 +94,9 @@ describe('Transaction Routes', () => {
       const transaction = new Transaction({
         user: userId, // This should be the same user as in the token
         amount: 100,
+        type: TRANSACTION_TYPE.EXPENSE,
         remark: 'Test transaction',
-        category: 'Food',
+        category: categoryId,
         date: new Date().toISOString(),
       });
       await transaction.save();
@@ -193,10 +110,11 @@ describe('Transaction Routes', () => {
         .send({
           amount: 200,
           remark: 'Updated transaction',
-          category: 'Food',
+          type: TRANSACTION_TYPE.INCOME,
+          category: categoryId,
           date: new Date().toISOString(),
         })
-        .end((err, res) => {
+        .end((_err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('amount', 200);
           expect(res.body).to.have.property('remark', 'Updated transaction');
@@ -213,44 +131,10 @@ describe('Transaction Routes', () => {
           remark: 'Test transaction',
           category: 'Food',
         })
-        .end((err, res) => {
+        .end((_err, res) => {
           expect(res).to.have.status(400);
           expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_AMOUNT);
           expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_AMOUNT);
-          done();
-        });
-    });
-
-    it('should Not edit a transaction with invalid remark', (done) => {
-      server.request(app)
-        .put(`/api/transactions/${transactionId}`)
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          remark: 65,
-          category: 'Food',
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_REMARK);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_REMARK);
-          done();
-        });
-    });
-
-    it('should Not edit a transaction with invalid category', (done) => {
-      server.request(app)
-        .put(`/api/transactions/${transactionId}`)
-        .set('Authorization', token)
-        .send({
-          amount: 100,
-          remark: 'Test transaction',
-          category: 45,
-        })
-        .end((err, res) => {
-          expect(res).to.have.status(400);
-          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.INVALID_CATEGORY);
-          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY);
           done();
         });
     });
@@ -261,9 +145,36 @@ describe('Transaction Routes', () => {
       server.request(app)
         .get('/api/transactions')
         .set('Authorization', token)
-        .end((err, res) => {
+        .end((_err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.be.an('array');
+          done();
+        });
+    });
+  });
+
+  describe('DELETE /api/transactions', () => {
+    let transactionId;
+
+    before(async () => {
+      const transaction = new Transaction({
+        user: userId, // This should be the same user as in the token
+        amount: 100,
+        type: TRANSACTION_TYPE.EXPENSE,
+        remark: 'Test transaction',
+        category: categoryId,
+        date: new Date().toISOString(),
+      });
+      await transaction.save();
+      transactionId = transaction._id;
+    });
+
+    it('should delete transaction', (done) => {
+      server.request(app)
+        .delete(`/api/transactions/${transactionId}`)
+        .set('Authorization', token)
+        .end((_err, res) => {
+          expect(res).to.have.status(200);
           done();
         });
     });

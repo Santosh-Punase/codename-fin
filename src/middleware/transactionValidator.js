@@ -2,6 +2,7 @@ import { body, validationResult } from 'express-validator';
 
 import { VALIDATION_ERROR_CODES } from '../const/errorCodes.js';
 import { transactionErrorHandler } from '../utils/errorHandler.js';
+import { TRANSACTION_TYPES } from '../config/contants.js';
 
 const transactionValidationRules = [
   body('amount')
@@ -14,10 +15,15 @@ const transactionValidationRules = [
     .withMessage(VALIDATION_ERROR_CODES.REMARK_IS_REQUIRED)
     .custom((value) => typeof value === 'string' && !!value.trim())
     .withMessage(VALIDATION_ERROR_CODES.INVALID_REMARK),
+  body('type')
+    .exists()
+    .withMessage(VALIDATION_ERROR_CODES.TRANSACTION_TYPE_IS_REQUIRED)
+    .isIn(TRANSACTION_TYPES)
+    .withMessage(VALIDATION_ERROR_CODES.TRANSACTION_TYPE_IS_INVALID),
   body('category')
     .exists()
     .withMessage(VALIDATION_ERROR_CODES.CATEGORY_IS_REQUIRED)
-    .custom((value) => typeof value === 'string' && !!value.trim())
+    .isMongoId()
     .withMessage(VALIDATION_ERROR_CODES.INVALID_CATEGORY),
 ];
 
