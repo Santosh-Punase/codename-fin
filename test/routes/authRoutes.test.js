@@ -4,8 +4,8 @@ import { server, expect } from '../server.js';
 import app from '../../src/app.js'; // Ensure server exports your app instance
 import User from '../../src/models/User.js';
 import { TEST_USER_NAME, TEST_USER_EMAIL, TEST_USER_PASSWORD } from '../../src/config/env.js';
-import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
-import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
+import { ERROR_CODES, VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
+import { ERROR, VALIDATION_ERROR } from '../../src/const/errorMessages.js';
 
 describe('Auth Routes', () => {
   after(async () => {
@@ -108,7 +108,7 @@ describe('Auth Routes', () => {
           email: TEST_USER_EMAIL,
           password: TEST_USER_PASSWORD,
         })
-        .end((err, res) => {
+        .end((_err, res) => {
           expect(res).to.have.status(200);
           expect(res.body).to.have.property('token');
           done();
@@ -122,9 +122,10 @@ describe('Auth Routes', () => {
           email: TEST_USER_EMAIL,
           password: 'wrongpassword',
         })
-        .end((err, res) => {
+        .end((_err, res) => {
           expect(res).to.have.status(401);
-          expect(res.body).to.have.property('error');
+          expect(res.body.error.code).to.equal(ERROR_CODES.INVALID_CREDENTIALS);
+          expect(res.body.error.message).to.equal(ERROR.INVALID_CREDENTIALS);
           done();
         });
     });

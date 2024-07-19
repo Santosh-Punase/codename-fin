@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import healthRoute from './routes/healthRoute.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 
@@ -32,6 +33,7 @@ connectDB();
 app.use(express.json());
 
 // Routes
+app.use('/health', healthRoute);
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/categories', categoryRoutes);
