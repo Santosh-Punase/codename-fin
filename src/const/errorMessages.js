@@ -12,6 +12,7 @@ const VALIDATION_ERROR = {
 
   INVALID_BUDGET: 'Please Enter a valid Budget',
   INVALID_CATEGORY_NAME: 'Please Enter a valid Name',
+  INVALID_PAYMENT_MODE_NAME: 'Please Enter a valid Name',
   INVALID_TRANSACTION_TYPE: 'Please enter a valid transaction type',
 };
 
@@ -37,6 +38,15 @@ const ERROR = {
   DELETE_CATEGORY_FAILED: VALIDATION_ERROR.DEFAULT,
   DELETE_FAILED_CATEGORY_DOES_NOT_EXIST: 'This record does not exist',
   DELETE_FAILED_CATEGORY_UNAUTHORIZED: 'You are not allowed to delete this record',
+
+  ADD_PAYMENT_MODE_FAILED: VALIDATION_ERROR.DEFAULT,
+  GET_PAYMENT_MODE_FAILED: 'No records found',
+  UPDATE_PAYMENT_MODE_FAILED: VALIDATION_ERROR.DEFAULT,
+  UPDATE_FAILED_PAYMENT_MODE_DOES_NOT_EXIST: 'This record does not exist',
+  UPDATE_FAILED_PAYMENT_MODE_UNAUTHORIZED: 'You are not allowed to update this record',
+  DELETE_PAYMENT_MODE_FAILED: VALIDATION_ERROR.DEFAULT,
+  DELETE_FAILED_PAYMENT_MODE_DOES_NOT_EXIST: 'This record does not exist',
+  DELETE_FAILED_PAYMENT_MODE_UNAUTHORIZED: 'You are not allowed to delete this record',
 };
 
 export { VALIDATION_ERROR, ERROR };

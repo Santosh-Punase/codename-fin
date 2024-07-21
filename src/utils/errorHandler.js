@@ -82,8 +82,24 @@ const categoryErrorHandler = (error) => {
   }
 };
 
+const paymentModeErrorHandler = (error) => {
+  switch (error.path) {
+    case 'name':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_PAYMENT_MODE_NAME,
+      });
+    default:
+      return ({
+        code: VALIDATION_ERROR_CODES.DEFAULT,
+        message: VALIDATION_ERROR.DEFAULT,
+      });
+  }
+};
+
 export {
   userErrorHandler,
   transactionErrorHandler,
   categoryErrorHandler,
+  paymentModeErrorHandler,
 };
