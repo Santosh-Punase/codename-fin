@@ -49,16 +49,24 @@ export const addTransaction = async (req, res) => {
 };
 
 export const getTransactions = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const {
+    page = 1, limit = 10, type, categories, paymentModes,
+  } = req.query;
+
+  const filter = { user: req.user.id };
+  if (type) filter.type = type;
+  if (categories) filter.category = { $in: categories.split(',') };
+  if (paymentModes) filter.paymentMode = { $in: paymentModes.split(',') };
+
   try {
-    const transactions = await Transaction.find({ user: req.user.id })
+    const transactions = await Transaction.find(filter)
       .populate('category', 'name')
       .populate('paymentMode', 'name')
       .sort({ updatedAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    const totalTransactions = await Transaction.countDocuments({ user: req.user.id });
+    const totalTransactions = await Transaction.countDocuments(filter);
 
     return res.status(200).json({
       transactions: transactions.map((transaction) => ({
