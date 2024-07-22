@@ -13,10 +13,12 @@ import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
 import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
 import { TRANSACTION_TYPE } from '../../src/config/contants.js';
 import Category from '../../src/models/Category.js';
+import PaymentMode from '../../src/models/PaymentMode.js';
 
 let token;
 let userId;
 let categoryId;
+let paymentModeId;
 
 describe('Transaction Routes', () => {
   before(async () => {
@@ -36,7 +38,14 @@ describe('Transaction Routes', () => {
       expenditure: 0,
       user: userId,
     });
+
+    const pMode = new PaymentMode({
+      name: 'Online',
+      user: userId,
+    });
     await category.save();
+    await pMode.save();
+    paymentModeId = pMode._id;
     categoryId = category._id;
 
     token = `Bearer ${jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY })}`;
@@ -57,6 +66,7 @@ describe('Transaction Routes', () => {
           amount: 100,
           type: TRANSACTION_TYPE.EXPENSE,
           remark: 'Test transaction',
+          paymentMode: paymentModeId,
           category: categoryId,
         })
         .end((_err, res) => {
@@ -96,6 +106,7 @@ describe('Transaction Routes', () => {
         amount: 100,
         type: TRANSACTION_TYPE.EXPENSE,
         remark: 'Test transaction',
+        paymentMode: paymentModeId,
         category: categoryId,
         date: new Date().toISOString(),
       });
@@ -111,6 +122,7 @@ describe('Transaction Routes', () => {
           amount: 200,
           remark: 'Updated transaction',
           type: TRANSACTION_TYPE.INCOME,
+          paymentMode: paymentModeId,
           category: categoryId,
           date: new Date().toISOString(),
         })
@@ -163,6 +175,7 @@ describe('Transaction Routes', () => {
         type: TRANSACTION_TYPE.EXPENSE,
         remark: 'Test transaction',
         category: categoryId,
+        paymentMode: paymentModeId,
         date: new Date().toISOString(),
       });
       await transaction.save();

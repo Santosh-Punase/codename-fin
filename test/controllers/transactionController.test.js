@@ -10,6 +10,7 @@ import { ERROR } from '../../src/const/errorMessages.js';
 import {
   addTransaction, deleteTransaction, getTransactions, updateTransaction,
 } from '../../src/controllers/transactionController.js';
+import PaymentMode from '../../src/models/PaymentMode.js';
 
 use(sinonChai);
 
@@ -30,6 +31,11 @@ const mockCategory = {
   expenditure: 0,
 };
 
+const mockPaymentMode = {
+  user: mockUser.id,
+  name: 'Online',
+};
+
 describe('Transaction Controller', () => {
   let request;
   let response;
@@ -37,6 +43,7 @@ describe('Transaction Controller', () => {
   let saveCategoryStub;
   let findTransactionStub;
   let findOneCategoryStub;
+  let findOnePaymentModeStub;
   let findTransactionByIdStub;
   let findCategoryByIdStub;
   let deleteOneStub;
@@ -56,6 +63,7 @@ describe('Transaction Controller', () => {
     saveCategoryStub = sinon.stub();
     findTransactionStub = sinon.stub(Transaction, 'find');
     findOneCategoryStub = sinon.stub(Category, 'findOne');
+    findOnePaymentModeStub = sinon.stub(PaymentMode, 'findOne');
     findTransactionByIdStub = sinon.stub(Transaction, 'findById');
     findCategoryByIdStub = sinon.stub(Category, 'findById');
     deleteOneStub = sinon.stub(Transaction.prototype, 'deleteOne');
@@ -69,6 +77,7 @@ describe('Transaction Controller', () => {
     it('should add a transaction and return 201', async () => {
       const mockResponse = { ...mockTransaction, _id: mockUser.id };
       findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      findOnePaymentModeStub.resolves({ ...mockPaymentMode });
       saveTransactionStub.resolves(mockResponse);
       saveCategoryStub.resolves(mockCategory);
       response.json.returns(mockResponse);
@@ -83,6 +92,7 @@ describe('Transaction Controller', () => {
       const mockResponse = { ...mockTransaction, _id: mockUser.id };
       findOneCategoryStub.resolves(null);
       saveTransactionStub.resolves(mockResponse);
+      findOnePaymentModeStub.resolves({ ...mockPaymentMode });
       saveCategoryStub.resolves(mockCategory);
       response.json.returns(mockResponse);
 
@@ -101,6 +111,7 @@ describe('Transaction Controller', () => {
 
     it('should return 500 if there is an error', async () => {
       findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      findOnePaymentModeStub.resolves({ ...mockPaymentMode });
       saveCategoryStub.resolves(mockCategory);
       saveTransactionStub.rejects(new Error('Database error'));
       response.json.returns(new Error('Database error'));

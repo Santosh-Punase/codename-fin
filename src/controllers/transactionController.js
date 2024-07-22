@@ -1,5 +1,6 @@
 import Transaction from '../models/Transaction.js';
 import Category from '../models/Category.js';
+import PaymentMode from '../models/PaymentMode.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
@@ -9,13 +10,14 @@ const DEFAULT_DATE = new Date().toISOString();
 
 export const addTransaction = async (req, res) => {
   const {
-    amount, remark, category, type, date = DEFAULT_DATE,
+    amount, remark, category, type, paymentMode, date = DEFAULT_DATE,
   } = req.body;
   try {
     // Check if the category exists and belongs to the user
     const _category = await Category.findOne({ _id: category, user: req.user.id });
+    const _pmode = await PaymentMode.findOne({ _id: paymentMode, user: req.user.id });
 
-    if (!_category) {
+    if (!_category || !_pmode) {
       logger.error(
         `Unable to add transaction for user: ${req.user.id}, category not found: ${category}`,
       );
@@ -29,6 +31,7 @@ export const addTransaction = async (req, res) => {
       remark,
       type,
       category,
+      paymentMode,
       date,
     });
     await transaction.save();
@@ -60,7 +63,7 @@ export const getTransactions = async (req, res) => {
 export const updateTransaction = async (req, res) => {
   const { id } = req.params;
   const {
-    amount, remark, category, type, date = DEFAULT_DATE,
+    amount, remark, category, type, paymentMode, date = DEFAULT_DATE,
   } = req.body;
   try {
     const transaction = await Transaction.findById(id);
@@ -98,6 +101,7 @@ export const updateTransaction = async (req, res) => {
     transaction.remark = remark;
     transaction.type = type;
     transaction.category = category;
+    transaction.paymentMode = paymentMode;
     transaction.date = date;
     await transaction.save();
 
