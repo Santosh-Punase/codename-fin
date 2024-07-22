@@ -49,9 +49,38 @@ export const addTransaction = async (req, res) => {
 };
 
 export const getTransactions = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
   try {
-    const transactions = await Transaction.find({ user: req.user.id });
-    return res.status(200).json(transactions);
+    const transactions = await Transaction.find({ user: req.user.id })
+      .populate('category', 'name')
+      .populate('paymentMode', 'name')
+      .sort({ updatedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const totalTransactions = await Transaction.countDocuments({ user: req.user.id });
+
+    return res.status(200).json({
+      transactions: transactions.map((transaction) => ({
+        id: transaction._id,
+        amount: transaction.amount,
+        description: transaction.description,
+        date: transaction.date,
+        type: transaction.type,
+        category: {
+          id: transaction.category._id,
+          name: transaction.category.name,
+        },
+        paymentMode: {
+          id: transaction.paymentMode._id,
+          name: transaction.paymentMode.name,
+        },
+        updatedAt: transaction.updatedAt,
+      })),
+      totalTransactions,
+      totalPages: Math.ceil(totalTransactions / limit),
+      currentPage: Number(page),
+    });
   } catch (err) {
     logger.error(`Unable to get transactions for user: ${req.user.id}, ${err}`);
     return res.status(500).json({

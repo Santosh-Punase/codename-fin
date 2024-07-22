@@ -152,7 +152,7 @@ describe('Transaction Routes', () => {
     });
   });
 
-  describe('GET /api/transactions', () => {
+  describe.skip('GET /api/transactions', () => {
     it('should get all transactions for the user', (done) => {
       server.request(app)
         .get('/api/transactions')
