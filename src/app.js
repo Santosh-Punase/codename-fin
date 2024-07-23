@@ -13,6 +13,7 @@ import limiter from './middleware/rateLimiter.js';
 import { CORS_DOMAIN } from './config/env.js';
 
 const app = express();
+app.set('trust proxy', 1);
 
 // Rate Limiting
 app.use(limiter());
