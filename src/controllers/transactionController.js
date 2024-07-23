@@ -76,12 +76,12 @@ export const getTransactions = async (req, res) => {
         date: transaction.date,
         type: transaction.type,
         category: {
-          id: transaction.category._id,
-          name: transaction.category.name,
+          id: transaction.category?._id,
+          name: transaction.category?.name,
         },
         paymentMode: {
-          id: transaction.paymentMode._id,
-          name: transaction.paymentMode.name,
+          id: transaction.paymentMode?._id,
+          name: transaction.paymentMode?.name,
         },
         updatedAt: transaction.updatedAt,
       })),
