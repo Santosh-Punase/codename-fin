@@ -5,6 +5,7 @@ const VALIDATION_ERROR = {
   EMAIL_ALREADY_EXISTS: 'User already exists',
   INVALID_PASSWORD_LENGTH: 'Password should be 6 to 12 characters',
   PASSWORD_DO_NOT_MATCH: 'Password do not match',
+  USERNAME_IS_REQUIRED: 'Please Enter a username',
 
   INVALID_AMOUNT: 'Please Enter a valid Amount',
   INVALID_REMARK: 'Please Enter a valid Remark',
@@ -19,6 +20,9 @@ const VALIDATION_ERROR = {
 const ERROR = {
   INVALID_CREDENTIALS: 'Invalid credentials',
   NOT_AUTHORIZED: 'Not authorized',
+
+  SERVER_ERROR: 'Server error',
+  USER_NOT_FOUND: 'User not found',
 
   ADD_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
   GET_TRANSACTION_FAILED: 'No transactions found',

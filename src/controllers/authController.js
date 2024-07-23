@@ -40,3 +40,52 @@ export const login = async (req, res) => {
     return res.status(500).json({ error: { code: err.code, message: err.message } });
   }
 };
+
+export const getUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId).select(['username', 'email']);
+    if (!user) {
+      return res.status(404).json({
+        error: {
+          code: ERROR_CODES.USER_NOT_FOUND, message: ERROR.USER_NOT_FOUND,
+        },
+      });
+    }
+    return res.json({ username: user.username, email: user.email });
+  } catch (err) {
+    return res.status(500).json({
+      error: {
+        code: ERROR_CODES.SERVER_ERROR, message: ERROR.SERVER_ERROR,
+      },
+    });
+  }
+};
+
+export const updateUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { username } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        error: {
+          code: ERROR_CODES.USER_NOT_FOUND, message: ERROR.USER_NOT_FOUND,
+        },
+      });
+    }
+
+    // Update user fields
+    if (username) user.username = username;
+
+    await user.save();
+    return res.json({ username: user.username, email: user.email });
+  } catch (err) {
+    return res.status(500).json({
+      error: {
+        code: ERROR_CODES.SERVER_ERROR, message: ERROR.SERVER_ERROR,
+      },
+    });
+  }
+};

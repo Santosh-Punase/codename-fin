@@ -89,7 +89,6 @@ export const deleteCategory = async (req, res) => {
         error: {
           code: ERROR_CODES.DELETE_FAILED_CATEGORY_DOES_NOT_EXIST,
           message: ERROR.DELETE_FAILED_CATEGORY_DOES_NOT_EXIST,
-
         },
       });
     }
