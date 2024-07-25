@@ -72,7 +72,7 @@ export const getTransactions = async (req, res) => {
       transactions: transactions.map((transaction) => ({
         id: transaction._id,
         amount: transaction.amount,
-        description: transaction.description,
+        remark: transaction.remark,
         date: transaction.date,
         type: transaction.type,
         category: {
