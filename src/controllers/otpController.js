@@ -23,7 +23,7 @@ export const sendOtp = async (req, res) => {
   }
 
   const otp = generateOTP();
-  const expiresAt = new Date(Date.now() + 60 * 1000); // 1 minute expiry
+  const expiresAt = new Date(Date.now() + 60 * 2000); // 2 minute expiry
 
   if (otpData) {
     otpData.otp = otp;
