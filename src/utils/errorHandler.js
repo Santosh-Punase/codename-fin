@@ -97,9 +97,30 @@ const paymentModeErrorHandler = (error) => {
   }
 };
 
+const otpErrorHandler = (error) => {
+  switch (error.path) {
+    case 'email':
+      return ({
+        code: VALIDATION_ERROR_CODES.INVALID_EMAIL,
+        message: VALIDATION_ERROR.INVALID_EMAIL,
+      });
+    case 'otp':
+      return ({
+        code: VALIDATION_ERROR_CODES.INVALID_OTP,
+        message: VALIDATION_ERROR.INVALID_OTP,
+      });
+    default:
+      return ({
+        code: VALIDATION_ERROR_CODES.DEFAULT,
+        message: VALIDATION_ERROR.DEFAULT,
+      });
+  }
+};
+
 export {
   userErrorHandler,
   transactionErrorHandler,
   categoryErrorHandler,
   paymentModeErrorHandler,
+  otpErrorHandler,
 };

@@ -12,3 +12,7 @@ export const { TEST_USER_NAME } = process.env;
 export const { TEST_USER_EMAIL } = process.env;
 export const { TEST_USER_PASSWORD } = process.env;
 export const { CORS_DOMAIN } = process.env;
+export const { VERIFIER_MAIL_ID } = process.env;
+export const { VERIFIER_PASS } = process.env;
+export const { VERIFIER_PROVIDER } = process.env;
+export const { VERIFIER_PORT } = process.env;

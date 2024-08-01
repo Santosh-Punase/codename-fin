@@ -7,6 +7,9 @@ const VALIDATION_ERROR = {
   PASSWORD_DO_NOT_MATCH: 'Password do not match',
   USERNAME_IS_REQUIRED: 'Please Enter a username',
 
+  INVALID_OTP: 'OTP does not match',
+  OTP_EXPIRED: 'OTP has expired',
+
   INVALID_AMOUNT: 'Please Enter a valid Amount',
   INVALID_REMARK: 'Please Enter a valid Remark',
   INVALID_CATEGORY: 'Please Enter a valid Category',
@@ -23,6 +26,9 @@ const ERROR = {
 
   SERVER_ERROR: 'Server error',
   USER_NOT_FOUND: 'User not found',
+
+  ACCOUNT_LOCKED_FOR_THE_DAY: 'Your account is locked for the day. Please continue after 24 hours',
+  FAILED_TO_SEND_OTP: 'Failed to send OTP',
 
   ADD_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
   GET_TRANSACTION_FAILED: 'No transactions found',

@@ -1,12 +1,18 @@
 import winston from 'winston';
 
+const getFileName = (path, name) => {
+  const date = new Date().toISOString().split('T')[0];
+  return `${path}/${date}-${name}`;
+};
 const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'info.log', level: 'info' }),
-    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.File({
+      filename: getFileName('logs/error', 'error.log'), level: 'error',
+    }),
+    new winston.transports.File({ filename: getFileName('logs/info', 'info.log'), level: 'info' }),
+    new winston.transports.File({ filename: getFileName('logs/combined', 'combined.log') }),
   ],
 });
 
