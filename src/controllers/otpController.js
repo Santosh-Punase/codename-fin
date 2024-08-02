@@ -1,9 +1,11 @@
 import OTP from '../models/OTP.js';
+import User from '../models/User.js';
+
 import logger from '../utils/logger.js';
 import { VERIFIER_MAIL_ID } from '../config/env.js';
 import { ERROR_CODES, VALIDATION_ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR, VALIDATION_ERROR } from '../const/errorMessages.js';
-import { generateOTP, transporter } from '../utils/index.js';
+import { generateOTP, generateToken, transporter } from '../utils/index.js';
 
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
@@ -90,6 +92,15 @@ export const verifyOtp = async (req, res) => {
   if (otpData.otp === parseInt(otp, 10)) {
     await OTP.deleteOne({ email }); // OTP is used, remove it
     logger.info(`OTP verified successfully ${email}`);
+
+    const user = await User.findOne({ email });
+    let token;
+    if (user) {
+      token = generateToken(user._id);
+    }
+    if (token) {
+      return res.status(200).json({ token });
+    }
     return res.send('OTP verified successfully');
   }
 
