@@ -65,7 +65,7 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { username } = req.body;
+    const { username, password } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -78,6 +78,7 @@ export const updateUser = async (req, res) => {
 
     // Update user fields
     if (username) user.username = username;
+    if (password) user.password = password;
 
     await user.save();
     return res.json({ username: user.username, email: user.email });
