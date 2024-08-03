@@ -11,17 +11,26 @@ export const sendOtp = async (req, res) => {
   const { email } = req.body;
 
   const currentDate = new Date();
-  const startOfDay = new Date(currentDate.setHours(0, 0, 0, 0));
-  const endOfDay = new Date(currentDate.setHours(23, 59, 59, 999));
 
-  const otpData = await OTP.findOne({ email, date: { $gte: startOfDay, $lt: endOfDay } });
-  if (otpData && otpData.requestCount >= 3) {
-    logger.error(`Unable to send OTP ${email}: Maximum tries reached for day`);
-    return res.status(429).json({
-      error: {
-        code: ERROR_CODES.ACCOUNT_LOCKED_FOR_THE_DAY, message: ERROR.ACCOUNT_LOCKED_FOR_THE_DAY,
-      },
-    });
+  const otpData = await OTP.findOne({ email });
+
+  let requestCount = otpData?.requestCount || 1;
+  if (otpData) {
+    const endOfFrozenTime = new Date(otpData.expiresAt);
+    endOfFrozenTime.setHours(endOfFrozenTime.getHours() + 24);
+    if (currentDate < endOfFrozenTime) {
+      if (otpData.requestCount >= 3) {
+        logger.error(`Unable to send OTP ${email}: Maximum tries reached for day`);
+        return res.status(429).json({
+          error: {
+            code: ERROR_CODES.ACCOUNT_LOCKED_FOR_THE_DAY, message: ERROR.ACCOUNT_LOCKED_FOR_THE_DAY,
+          },
+        });
+      }
+      requestCount += 1;
+    } else {
+      requestCount = 1;
+    }
   }
 
   const otp = generateOTP();
@@ -30,11 +39,11 @@ export const sendOtp = async (req, res) => {
   if (otpData) {
     otpData.otp = otp;
     otpData.expiresAt = expiresAt;
-    otpData.requestCount += 1;
+    otpData.requestCount = requestCount;
     await otpData.save();
   } else {
     await OTP.create({
-      email, otp, expiresAt, requestCount: 1,
+      email, otp, expiresAt, requestCount,
     });
   }
 
@@ -80,7 +89,7 @@ export const verifyOtp = async (req, res) => {
   }
 
   if (otpData.expiresAt < new Date()) {
-    logger.error(`Unable to send OTP ${email}: OTP Expired at ${otpData.expiresAt}`);
+    logger.error(`Unable to verify OTP ${email}: OTP Expired at ${otpData.expiresAt}`);
     return res.status(400).json({
       error: {
         code: VALIDATION_ERROR_CODES.OTP_EXPIRED,
@@ -104,7 +113,7 @@ export const verifyOtp = async (req, res) => {
     return res.send('OTP verified successfully');
   }
 
-  logger.error(`Unable to send OTP ${email}: Invalid OTP ${otp}`);
+  logger.error(`Unable to verify OTP ${email}: Invalid OTP ${otp}`);
   return res.status(400).json({
     error: {
       code: VALIDATION_ERROR_CODES.INVALID_OTP,

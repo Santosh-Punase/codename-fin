@@ -12,14 +12,11 @@ const OtpSchema = new mongoose.Schema({
   },
   expiresAt: {
     type: Date,
+    required: true,
   },
   requestCount: {
     type: Number,
     default: 0,
-  },
-  date: {
-    type: Date,
-    default: Date.now(),
   },
 });
 
