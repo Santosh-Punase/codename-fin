@@ -4,11 +4,12 @@ import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
 
 export const addPaymentMode = async (req, res) => {
-  const { name } = req.body;
+  const { name, balance } = req.body;
   try {
     const pMode = new PaymentMode({
       user: req.user.id,
       name,
+      balance,
     });
     await pMode.save();
     return res.status(201).json(pMode);
@@ -34,7 +35,7 @@ export const getPaymentModes = async (req, res) => {
 
 export const updatePaymentMode = async (req, res) => {
   const { id } = req.params;
-  const { name } = req.body;
+  const { name, balance } = req.body;
   try {
     const pMode = await PaymentMode.findById(id);
 
@@ -62,6 +63,7 @@ export const updatePaymentMode = async (req, res) => {
     }
 
     pMode.name = name;
+    pMode.balance = balance;
     await pMode.save();
     return res.status(200).json(pMode);
   } catch (err) {

@@ -41,6 +41,7 @@ describe('Transaction Routes', () => {
 
     const pMode = new PaymentMode({
       name: 'Online',
+      balance: 500,
       user: userId,
     });
     await category.save();

@@ -10,6 +10,10 @@ const paymentModeSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-});
+  balance: {
+    type: Number,
+    required: true,
+  },
+}, { timestamps: true });
 
 export default mongoose.model('PaymentMode', paymentModeSchema);
