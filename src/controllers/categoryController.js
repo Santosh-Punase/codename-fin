@@ -22,7 +22,7 @@ export const addCategory = async (req, res) => {
 };
 
 export const getCategories = async (req, res) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 50 } = req.query;
 
   try {
     const categories = await Category.find({ user: req.user.id })

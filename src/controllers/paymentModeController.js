@@ -22,9 +22,27 @@ export const addPaymentMode = async (req, res) => {
 };
 
 export const getPaymentModes = async (req, res) => {
+  const { page = 1, limit = 20 } = req.query;
+
   try {
-    const pModes = await PaymentMode.find({ user: req.user.id });
-    return res.status(200).json(pModes);
+    const pModes = await PaymentMode.find({ user: req.user.id })
+      .sort({ updatedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const totalPaymentModes = await PaymentMode.countDocuments({ user: req.user.id });
+
+    return res.status(200).json({
+      paymentModes: pModes.map((pMode) => ({
+        id: pMode._id,
+        name: pMode.name,
+        balance: pMode.balance,
+        updatedAt: pMode.updatedAt,
+      })),
+      totalPaymentModes,
+      totalPages: Math.ceil(totalPaymentModes / limit),
+      currentPage: Number(page),
+    });
   } catch (err) {
     logger.error(`Unable to get payment modes for user: ${req.user.id}, ${err}`);
     return res.status(500).json({
