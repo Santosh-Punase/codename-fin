@@ -125,7 +125,7 @@ describe('Category Routes', () => {
         .set('Authorization', token)
         .end((_err, res) => {
           expect(res).to.have.status(200);
-          expect(res.body).to.be.an('array');
+          expect(res.body.categories).to.be.an('array');
           done();
         });
     });

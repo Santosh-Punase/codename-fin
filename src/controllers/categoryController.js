@@ -22,9 +22,28 @@ export const addCategory = async (req, res) => {
 };
 
 export const getCategories = async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+
   try {
-    const categories = await Category.find({ user: req.user.id });
-    return res.status(200).json(categories);
+    const categories = await Category.find({ user: req.user.id })
+      .sort({ updatedAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    const totalCategories = await Category.countDocuments({ user: req.user.id });
+
+    return res.status(200).json({
+      categories: categories.map((category) => ({
+        id: category._id,
+        name: category.name,
+        budget: category.budget,
+        expenditure: category.expenditure,
+        updatedAt: category.updatedAt,
+      })),
+      totalCategories,
+      totalPages: Math.ceil(totalCategories / limit),
+      currentPage: Number(page),
+    });
   } catch (err) {
     logger.error(`Unable to get categories for user: ${req.user.id}, ${err}`);
     return res.status(500).json({

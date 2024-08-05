@@ -78,20 +78,52 @@ describe('Category Controller', () => {
   });
 
   describe('getCategories', () => {
+    let countDocumentsStub;
+
+    beforeEach(() => {
+      countDocumentsStub = sinon.stub(Category, 'countDocuments');
+    });
+
     it('should get all categories for a user and return 200', async () => {
-      const mockCategories = [mockCategory];
-      findCategoryStub.resolves(mockCategories);
+      const category = {
+        _id: 'abc123',
+        name: 'Entertainment',
+        budget: 500,
+        expenditure: 0,
+      };
+      const mockCategories = [category];
 
-      await getCategories(request, response);
+      findCategoryStub.returns({
+        sort: sinon.stub().returnsThis(),
+        skip: sinon.stub().returnsThis(),
+        limit: sinon.stub().resolves(mockCategories),
+      });
+      countDocumentsStub.resolves(1);
 
+      await getCategories({ ...request, query: { } }, response);
       expect(response.status).to.have.been.calledWith(200);
-      expect(response.json).to.have.been.calledWith(mockCategories);
+      expect(response.json).to.have.been.calledWith({
+        categories: [{
+          id: 'abc123',
+          name: 'Entertainment',
+          budget: 500,
+          expenditure: 0,
+          updatedAt: undefined,
+        }],
+        totalCategories: 1,
+        totalPages: 1,
+        currentPage: 1,
+      });
     });
 
     it('should return 500 if there is an error', async () => {
-      findCategoryStub.rejects(new Error('Database error'));
+      findCategoryStub.returns({
+        sort: sinon.stub().returnsThis(),
+        skip: sinon.stub().returnsThis(),
+        limit: sinon.stub().rejects(new Error('Database error')),
+      });
 
-      await getCategories(request, response);
+      await getCategories({ ...request, query: { } }, response);
 
       expect(response.status).to.have.been.calledWith(500);
       expect(logger.error).to.have.been
