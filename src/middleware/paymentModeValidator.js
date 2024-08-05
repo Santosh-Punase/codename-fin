@@ -9,6 +9,11 @@ const paymentModeValidationRules = [
     .withMessage(VALIDATION_ERROR_CODES.PAYMENT_MODE_NAME_IS_REQUIRED)
     .custom((value) => typeof value === 'string' && !!value.trim())
     .withMessage(VALIDATION_ERROR_CODES.INVALID_PAYMENT_MODE_NAME),
+  body('balance')
+    .custom((value) => !!value)
+    .withMessage(VALIDATION_ERROR_CODES.PAYMENT_MODE_BALANCE_IS_REQUIRED)
+    .isNumeric()
+    .withMessage(VALIDATION_ERROR_CODES.INVALID_BALANCE),
 ];
 
 const validatePaymentMode = (req, res, next) => {

@@ -89,6 +89,17 @@ const paymentModeErrorHandler = (error) => {
         code: error.msg,
         message: VALIDATION_ERROR.INVALID_PAYMENT_MODE_NAME,
       });
+    case 'balance':
+      if (error.msg === VALIDATION_ERROR_CODES.PAYMENT_MODE_BALANCE_IS_REQUIRED) {
+        return ({
+          code: VALIDATION_ERROR_CODES.PAYMENT_MODE_BALANCE_IS_REQUIRED,
+          message: VALIDATION_ERROR.INVALID_BALANCE,
+        });
+      }
+      return ({
+        code: VALIDATION_ERROR_CODES.INVALID_BALANCE,
+        message: VALIDATION_ERROR.INVALID_BALANCE,
+      });
     default:
       return ({
         code: VALIDATION_ERROR_CODES.DEFAULT,

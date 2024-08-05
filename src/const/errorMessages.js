@@ -17,6 +17,7 @@ const VALIDATION_ERROR = {
   INVALID_BUDGET: 'Please Enter a valid Budget',
   INVALID_CATEGORY_NAME: 'Please Enter a valid Name',
   INVALID_PAYMENT_MODE_NAME: 'Please Enter a valid Name',
+  INVALID_BALANCE: 'Please Enter a valid Balance',
   INVALID_TRANSACTION_TYPE: 'Please enter a valid transaction type',
 };
 
