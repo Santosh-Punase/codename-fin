@@ -9,6 +9,7 @@ import transactionRoutes from './routes/transactionRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import paymentModeRoutes from './routes/paymentModeRoutes.js';
 import otpRoutes from './routes/otpRoutes.js';
+import accountRoutes from './routes/accountRoutes.js';
 
 import limiter from './middleware/rateLimiter.js';
 import { CORS_DOMAIN } from './config/env.js';
@@ -37,6 +38,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/otp', otpRoutes);
+app.use('/api/summary', accountRoutes);
 app.use('/health', healthRoute);
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
