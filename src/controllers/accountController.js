@@ -51,8 +51,9 @@ export const getAccountSummary = async (req, res) => {
     const netAccountBalance = totalIncome - totalExpense;
 
     res.json({
+      totalIncome,
+      totalExpense,
       netAccountBalance,
-      totalSpent: totalExpense,
       totalMonthlyBudget: totalBudget,
       totalMonthlyExpenditure: totalExpenditure,
       paymentModes: paymentModeBalances,
