@@ -3,6 +3,25 @@ import bcrypt from 'bcryptjs';
 
 import { SALT_ROUND } from '../config/contants.js';
 
+const currencySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  symbol: {
+    type: String,
+    required: true,
+  },
+  locale: {
+    type: String,
+    required: true,
+  },
+  currencyCode: {
+    type: String,
+    required: true,
+  },
+}, { _id: false });
+
 const UserSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -16,6 +35,10 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+  },
+  currency: {
+    type: currencySchema,
+    required: false,
   },
 }, { timestamps: true });
 
