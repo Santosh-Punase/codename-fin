@@ -58,6 +58,9 @@ const ERROR = {
   DELETE_PAYMENT_MODE_FAILED: VALIDATION_ERROR.DEFAULT,
   DELETE_FAILED_PAYMENT_MODE_DOES_NOT_EXIST: 'This payment mode does not exist',
   DELETE_FAILED_PAYMENT_MODE_UNAUTHORIZED: 'You are not allowed to delete this payment mode',
+
+  RESET_ACCOUNT_DATA_FAILED_NO_PARAMS:
+    'No reset parameters provided. Please specify at least one reset option.',
 };
 
 export { VALIDATION_ERROR, ERROR };

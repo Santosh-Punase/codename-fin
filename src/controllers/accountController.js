@@ -2,7 +2,10 @@ import Transaction from '../models/Transaction.js';
 import Category from '../models/Category.js';
 import PaymentMode from '../models/PaymentMode.js';
 
-// eslint-disable-next-line import/prefer-default-export
+import logger from '../utils/logger.js';
+import { ERROR_CODES } from '../const/errorCodes.js';
+import { ERROR } from '../const/errorMessages.js';
+
 export const getAccountSummary = async (req, res) => {
   try {
     const userId = req.user._id;
@@ -50,7 +53,7 @@ export const getAccountSummary = async (req, res) => {
 
     const netAccountBalance = totalIncome - totalExpense;
 
-    res.json({
+    return res.json({
       totalIncome,
       totalExpense,
       netAccountBalance,
@@ -58,7 +61,58 @@ export const getAccountSummary = async (req, res) => {
       totalMonthlyExpenditure: totalExpenditure,
       paymentModes: paymentModeBalances,
     });
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
+  } catch (err) {
+    logger.error(`Unable to get account summary for user ${req.user.id}, ${err}`);
+    return res.status(500).json({
+      error: {
+        code: ERROR_CODES.GET_ACCOUNT_SUMMARY_FAILED,
+        message: ERROR.SERVER_ERROR,
+      },
+    });
+  }
+};
+
+export const resetData = async (req, res) => {
+  try {
+    const { resetTransactions, resetPaymentModes, resetCategories } = req.query;
+    const userId = req.user._id;
+
+    if (!resetTransactions && !resetPaymentModes && !resetCategories) {
+      logger.error(
+        `Reset account data error for user ${req.user.id}, No Reset Parameters provided`,
+      );
+
+      return res.status(500).json({
+        error: {
+          code: ERROR_CODES.RESET_ACCOUNT_DATA_FAILED_NO_PARAMS,
+          message: ERROR.RESET_ACCOUNT_DATA_FAILED_NO_PARAMS,
+        },
+      });
+    }
+
+    // Reset Transactions
+    if (resetTransactions === 'true') {
+      await Transaction.deleteMany({ user: userId });
+    }
+
+    // Reset Payment Modes
+    if (resetPaymentModes === 'true') {
+      await PaymentMode.deleteMany({ user: userId });
+    }
+
+    // Reset Categories
+    if (resetCategories === 'true') {
+      await Category.deleteMany({ user: userId });
+    }
+
+    return res.status(200).json({ message: 'Reset completed successfully.' });
+  } catch (err) {
+    logger.error(`Unable to reset account data for user ${req.user.id}, ${err}`);
+    return res.status(500).json({
+      error: {
+        code: ERROR_CODES.RESET_ACCOUNT_DATA_FAILED,
+        message: err.message,
+      },
+    });
   }
 };

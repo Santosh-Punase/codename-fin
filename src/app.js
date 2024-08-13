@@ -38,7 +38,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/otp', otpRoutes);
-app.use('/api/summary', accountRoutes);
+app.use('/api', accountRoutes);
 app.use('/health', healthRoute);
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);

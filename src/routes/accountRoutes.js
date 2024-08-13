@@ -1,10 +1,11 @@
 import express from 'express';
 
-import { getAccountSummary } from '../controllers/accountController.js';
+import { getAccountSummary, resetData } from '../controllers/accountController.js';
 import protect from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.get('/', protect, getAccountSummary);
+router.get('/summary', protect, getAccountSummary);
+router.post('/reset', protect, resetData);
 
 export default router;
