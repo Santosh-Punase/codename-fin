@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import { PAYMENT_MODE_TYPES } from '../config/contants.js';
+
 const paymentModeSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,6 +10,11 @@ const paymentModeSchema = new mongoose.Schema({
   },
   name: {
     type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: PAYMENT_MODE_TYPES,
     required: true,
   },
   balance: {

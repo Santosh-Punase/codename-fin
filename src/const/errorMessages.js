@@ -13,12 +13,16 @@ const VALIDATION_ERROR = {
   INVALID_AMOUNT: 'Please Enter a valid Amount',
   INVALID_REMARK: 'Please Enter a valid Remark',
   INVALID_CATEGORY: 'Please Enter a valid Category',
+  INVALID_PAYMENT_MODE: 'Please Enter a valid Payment Mode',
+  INVALID_TRANSACTION_TYPE: 'Please enter a valid transaction type',
 
   INVALID_BUDGET: 'Please Enter a valid Budget',
   INVALID_CATEGORY_NAME: 'Please Enter a valid Name',
+  INVALID_CATEGORY_TYPE: 'Please enter a valid type',
+
   INVALID_PAYMENT_MODE_NAME: 'Please Enter a valid Name',
   INVALID_BALANCE: 'Please Enter a valid Balance',
-  INVALID_TRANSACTION_TYPE: 'Please enter a valid transaction type',
+  INVALID_PAYMENT_MODE_TYPE: 'Please enter a valid type',
 };
 
 const ERROR = {
@@ -40,6 +44,7 @@ const ERROR = {
   DELETE_FAILED_TRANSACTION_DOES_NOT_EXIST: 'This transaction does not exist',
   DELETE_FAILED_TRANSACTION_UNAUTHORIZED: 'You are not allowed to delete this transaction',
   CATEGORY_NOT_FOUND: 'Category not found',
+  PAYMENT_MODE_NOT_FOUND: 'Payment mode not found',
 
   ADD_CATEGORY_FAILED: VALIDATION_ERROR.DEFAULT,
   GET_CATEGORY_FAILED: 'No categoris found',

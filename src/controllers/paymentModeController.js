@@ -4,11 +4,12 @@ import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
 
 export const addPaymentMode = async (req, res) => {
-  const { name, balance } = req.body;
+  const { name, type, balance } = req.body;
   try {
     const pMode = new PaymentMode({
       user: req.user.id,
       name,
+      type,
       balance,
     });
     await pMode.save();
@@ -22,20 +23,24 @@ export const addPaymentMode = async (req, res) => {
 };
 
 export const getPaymentModes = async (req, res) => {
-  const { page = 1, limit = 20 } = req.query;
+  const { page = 1, limit = 20, type } = req.query;
 
   try {
-    const pModes = await PaymentMode.find({ user: req.user.id })
+    const matchCondition = { user: req.user._id };
+    if (type) matchCondition.type = type; // Filter by type if provided
+
+    const pModes = await PaymentMode.find(matchCondition)
       .sort({ updatedAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    const totalPaymentModes = await PaymentMode.countDocuments({ user: req.user.id });
+    const totalPaymentModes = await PaymentMode.countDocuments(matchCondition);
 
     return res.status(200).json({
       paymentModes: pModes.map((pMode) => ({
         id: pMode._id,
         name: pMode.name,
+        type: pMode.type,
         balance: pMode.balance,
         updatedAt: pMode.updatedAt,
       })),
@@ -53,7 +58,7 @@ export const getPaymentModes = async (req, res) => {
 
 export const updatePaymentMode = async (req, res) => {
   const { id } = req.params;
-  const { name, balance } = req.body;
+  const { name, type, balance } = req.body;
   try {
     const pMode = await PaymentMode.findById(id);
 
@@ -81,6 +86,7 @@ export const updatePaymentMode = async (req, res) => {
     }
 
     pMode.name = name;
+    pMode.type = type;
     pMode.balance = balance;
     await pMode.save();
     return res.status(200).json(pMode);

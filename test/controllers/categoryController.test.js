@@ -9,6 +9,7 @@ import { ERROR } from '../../src/const/errorMessages.js';
 import {
   addCategory, deleteCategory, getCategories, updateCategory,
 } from '../../src/controllers/categoryController.js';
+import { CATEGORY_TYPE } from '../../src/config/contants.js';
 
 use(sinonChai);
 
@@ -89,6 +90,7 @@ describe('Category Controller', () => {
         _id: 'abc123',
         name: 'Entertainment',
         budget: 500,
+        type: CATEGORY_TYPE.INCOME,
         expenditure: 0,
       };
       const mockCategories = [category];
@@ -107,6 +109,7 @@ describe('Category Controller', () => {
           id: 'abc123',
           name: 'Entertainment',
           budget: 500,
+          type: CATEGORY_TYPE.INCOME,
           expenditure: 0,
           updatedAt: undefined,
         }],

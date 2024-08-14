@@ -74,6 +74,11 @@ const categoryErrorHandler = (error) => {
         code: error.msg,
         message: VALIDATION_ERROR.INVALID_BUDGET,
       });
+    case 'type':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_CATEGORY_TYPE,
+      });
     default:
       return ({
         code: VALIDATION_ERROR_CODES.DEFAULT,
@@ -99,6 +104,11 @@ const paymentModeErrorHandler = (error) => {
       return ({
         code: VALIDATION_ERROR_CODES.INVALID_BALANCE,
         message: VALIDATION_ERROR.INVALID_BALANCE,
+      });
+    case 'type':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_PAYMENT_MODE_TYPE,
       });
     default:
       return ({

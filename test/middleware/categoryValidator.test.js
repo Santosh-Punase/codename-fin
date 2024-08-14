@@ -7,6 +7,7 @@ import {
 } from '../../src/middleware/categoryValidator.js';
 import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
 import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
+import { CATEGORY_TYPE } from '../../src/config/contants.js';
 
 // Express setup for testing
 const app = express();
@@ -25,7 +26,7 @@ describe('Category Validator Middleware', () => {
   it('should fail if name is not provided', async () => {
     const res = await server.request(app)
       .post('/test-category')
-      .send({ budget: 500 });
+      .send({ budget: 500, type: CATEGORY_TYPE.INCOME });
 
     expect(res).to.have.status(400);
     expect(res.body.error).to.deep.equal({
@@ -37,7 +38,7 @@ describe('Category Validator Middleware', () => {
   it('should fail if amount is not a number', async () => {
     const res = await server.request(app)
       .post('/test-category')
-      .send({ name: '  ', budget: 500 });
+      .send({ name: '  ', budget: 500, type: CATEGORY_TYPE.INCOME });
 
     expect(res).to.have.status(400);
     expect(res.body.error).to.deep.equal({
@@ -49,7 +50,7 @@ describe('Category Validator Middleware', () => {
   it('should fail if budget is not provided', async () => {
     const res = await server.request(app)
       .post('/test-category')
-      .send({ name: 'Entertainment' });
+      .send({ name: 'Entertainment', type: CATEGORY_TYPE.INCOME });
 
     expect(res).to.have.status(400);
     expect(res.body.error).to.deep.equal({
@@ -61,7 +62,7 @@ describe('Category Validator Middleware', () => {
   it('should fail if budget is not valid', async () => {
     const res = await server.request(app)
       .post('/test-category')
-      .send({ name: 'Entertainment', budget: '  ' });
+      .send({ name: 'Entertainment', budget: '  ', type: CATEGORY_TYPE.INCOME });
 
     expect(res).to.have.status(400);
     expect(res.body.error).to.deep.equal({
@@ -73,7 +74,7 @@ describe('Category Validator Middleware', () => {
   it('should fail if budget is not valid', async () => {
     const res = await server.request(app)
       .post('/test-category')
-      .send({ name: 'Entertainment', budget: 'abc' });
+      .send({ name: 'Entertainment', budget: 'abc', type: CATEGORY_TYPE.INCOME });
 
     expect(res).to.have.status(400);
     expect(res.body.error).to.deep.equal({
@@ -82,11 +83,36 @@ describe('Category Validator Middleware', () => {
     });
   });
 
+  it('should fail if type is not provided', async () => {
+    const res = await server.request(app)
+      .post('/test-category')
+      .send({ name: 'Entertainment', budget: 500 });
+
+    expect(res).to.have.status(400);
+    expect(res.body.error).to.deep.equal({
+      code: VALIDATION_ERROR_CODES.CATEGORY_TYPE_IS_REQUIRED,
+      message: VALIDATION_ERROR.INVALID_CATEGORY_TYPE,
+    });
+  });
+
+  it('should fail if type is not valid', async () => {
+    const res = await server.request(app)
+      .post('/test-category')
+      .send({ name: 'Entertainment', budget: 500, type: 'income' });
+
+    expect(res).to.have.status(400);
+    expect(res.body.error).to.deep.equal({
+      code: VALIDATION_ERROR_CODES.CATEGORY_TYPE_IS_INVALID,
+      message: VALIDATION_ERROR.INVALID_CATEGORY_TYPE,
+    });
+  });
+
   it('should pass if all fields are valid', async () => {
     const res = await server.request(app)
       .post('/test-category')
-      .send({ name: 'Entertainment', budget: '100' });
+      .send({ name: 'Entertainment', budget: 100, type: CATEGORY_TYPE.INCOME });
 
+    console.log('res', res.body);
     expect(res).to.have.status(200);
     expect(res.text).to.equal(SUCCESS_MESSAGE);
   });

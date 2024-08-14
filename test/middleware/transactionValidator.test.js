@@ -127,6 +127,42 @@ describe('Transaction Validator Middleware', () => {
     });
   });
 
+  it('should fail if payment mode is not provided', async () => {
+    const res = await server.request(app)
+      .post('/test-transaction')
+      .send({
+        amount: 45,
+        remark:
+        'remark',
+        category: '60d21b4667d0d8992e610c85',
+        type: TRANSACTION_TYPE.EXPENSE,
+      });
+
+    expect(res).to.have.status(400);
+    expect(res.body.error).to.deep.equal({
+      code: VALIDATION_ERROR_CODES.PAYMENT_MODE_IS_REQUIRED,
+      message: VALIDATION_ERROR.INVALID_PAYMENT_MODE,
+    });
+  });
+
+  it('should fail if payment mode is not a valid Mongo ID', async () => {
+    const res = await server.request(app)
+      .post('/test-transaction')
+      .send({
+        amount: 45,
+        remark: 'remark',
+        type: TRANSACTION_TYPE.EXPENSE,
+        category: '60d21b4667d0d8992e610c85',
+        paymentMode: 'invalid',
+      });
+
+    expect(res).to.have.status(400);
+    expect(res.body.error).to.deep.equal({
+      code: VALIDATION_ERROR_CODES.INVALID_PAYMENT_MODE,
+      message: VALIDATION_ERROR.INVALID_PAYMENT_MODE,
+    });
+  });
+
   it('should pass if all fields are valid', async () => {
     const res = await server.request(app)
       .post('/test-transaction')
@@ -135,6 +171,7 @@ describe('Transaction Validator Middleware', () => {
         remark: 'remark',
         type: TRANSACTION_TYPE.EXPENSE,
         category: '60d21b4667d0d8992e610c85',
+        paymentMode: '60d21b4667d0d8992e610a72',
       });
 
     expect(res).to.have.status(200);

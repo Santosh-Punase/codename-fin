@@ -11,7 +11,7 @@ import {
 } from '../../src/config/env.js';
 import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
 import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
-import { TRANSACTION_TYPE } from '../../src/config/contants.js';
+import { CATEGORY_TYPE, PAYMENT_MODE_TYPE, TRANSACTION_TYPE } from '../../src/config/contants.js';
 import Category from '../../src/models/Category.js';
 import PaymentMode from '../../src/models/PaymentMode.js';
 
@@ -36,12 +36,14 @@ describe('Transaction Routes', () => {
       name: 'Entertainment',
       budget: 500,
       expenditure: 0,
+      type: CATEGORY_TYPE.EXPENSE,
       user: userId,
     });
 
     const pMode = new PaymentMode({
       name: 'Online',
       balance: 500,
+      type: PAYMENT_MODE_TYPE.BANK,
       user: userId,
     });
     await category.save();

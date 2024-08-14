@@ -4,11 +4,12 @@ import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
 
 export const addCategory = async (req, res) => {
-  const { name, budget } = req.body;
+  const { name, type, budget } = req.body;
   try {
     const category = new Category({
       user: req.user.id,
       name,
+      type,
       budget,
     });
     await category.save();
@@ -22,20 +23,24 @@ export const addCategory = async (req, res) => {
 };
 
 export const getCategories = async (req, res) => {
-  const { page = 1, limit = 50 } = req.query;
+  const { page = 1, limit = 50, type } = req.query;
 
   try {
-    const categories = await Category.find({ user: req.user.id })
+    const matchCondition = { user: req.user._id };
+    if (type) matchCondition.type = type; // Filter by type if provided
+
+    const categories = await Category.find(matchCondition)
       .sort({ updatedAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 
-    const totalCategories = await Category.countDocuments({ user: req.user.id });
+    const totalCategories = await Category.countDocuments(matchCondition);
 
     return res.status(200).json({
       categories: categories.map((category) => ({
         id: category._id,
         name: category.name,
+        type: category.type,
         budget: category.budget,
         expenditure: category.expenditure,
         updatedAt: category.updatedAt,
@@ -54,7 +59,8 @@ export const getCategories = async (req, res) => {
 
 export const updateCategory = async (req, res) => {
   const { id } = req.params;
-  const { name, budget } = req.body;
+  const { name, type, budget } = req.body;
+
   try {
     const category = await Category.findById(id);
 
@@ -82,6 +88,7 @@ export const updateCategory = async (req, res) => {
     }
 
     category.name = name;
+    category.type = type;
     category.budget = budget;
     await category.save();
     return res.status(200).json(category);

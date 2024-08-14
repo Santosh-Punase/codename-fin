@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+import { CATEGORY_TYPES } from '../config/contants.js';
+
 const categorySchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,6 +10,11 @@ const categorySchema = new mongoose.Schema({
   },
   name: {
     type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    enum: CATEGORY_TYPES,
     required: true,
   },
   budget: {

@@ -8,8 +8,29 @@ export const RATE_LIMIT_CONFIG = {
 };
 
 export const TRANSACTION_TYPE = {
-  INCOME: 'income',
-  EXPENSE: 'expense',
+  INCOME: 'Income',
+  EXPENSE: 'Expense',
 };
 
 export const TRANSACTION_TYPES = [TRANSACTION_TYPE.INCOME, TRANSACTION_TYPE.EXPENSE];
+
+export const CATEGORY_TYPE = {
+  INCOME: 'Income',
+  EXPENSE: 'Expense',
+};
+
+export const CATEGORY_TYPES = [CATEGORY_TYPE.INCOME, CATEGORY_TYPE.EXPENSE];
+
+export const PAYMENT_MODE_TYPE = {
+  BANK: 'Bank',
+  CASH: 'Cash',
+  WALLET: 'Wallet',
+  CREDIT_CARD: 'Credit_Card',
+};
+
+export const PAYMENT_MODE_TYPES = [
+  PAYMENT_MODE_TYPE.BANK,
+  PAYMENT_MODE_TYPE.CASH,
+  PAYMENT_MODE_TYPE.WALLET,
+  PAYMENT_MODE_TYPE.CREDIT_CARD,
+];

@@ -11,6 +11,7 @@ import {
 } from '../../src/config/env.js';
 import { VALIDATION_ERROR_CODES } from '../../src/const/errorCodes.js';
 import { VALIDATION_ERROR } from '../../src/const/errorMessages.js';
+import { CATEGORY_TYPE } from '../../src/config/contants.js';
 
 let token;
 let userId;
@@ -43,6 +44,7 @@ describe('Category Routes', () => {
         .send({
           name: 'Entertainment',
           budget: 500,
+          type: CATEGORY_TYPE.EXPENSE,
         })
         .end((_err, res) => {
           expect(res).to.have.status(201);
@@ -78,6 +80,7 @@ describe('Category Routes', () => {
         name: 'Entertainment',
         budget: 500,
         expenditure: 0,
+        type: CATEGORY_TYPE.EXPENSE,
         user: userId,
       });
       await category.save();
@@ -91,6 +94,7 @@ describe('Category Routes', () => {
         .send({
           name: 'Entertainment',
           budget: 600,
+          type: CATEGORY_TYPE.EXPENSE,
         })
         .end((_err, res) => {
           expect(res).to.have.status(200);
@@ -108,6 +112,7 @@ describe('Category Routes', () => {
         .send({
           name: 'Entertainment',
           budget: 'invalid',
+          type: CATEGORY_TYPE.EXPENSE,
         })
         .end((_err, res) => {
           expect(res).to.have.status(400);
@@ -139,6 +144,7 @@ describe('Category Routes', () => {
         name: 'Entertainment',
         budget: 500,
         expenditure: 0,
+        type: CATEGORY_TYPE.EXPENSE,
         user: userId,
       });
       await category.save();

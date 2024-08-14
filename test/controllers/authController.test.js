@@ -12,11 +12,18 @@ import {
 import { ERROR_CODES } from '../../src/const/errorCodes.js';
 import { ERROR } from '../../src/const/errorMessages.js';
 import { login, register } from '../../src/controllers/authController.js';
+import Category from '../../src/models/Category.js';
+import PaymentMode from '../../src/models/PaymentMode.js';
 
 use(sinonChai);
 
 describe('Auth Controller', () => {
-  let request; let response; let userStub; let jwtStub;
+  let request;
+  let response;
+  let userStub;
+  let jwtStub;
+  let addDefaultCategoriesStub;
+  let addDefaultPaymentModesStub;
 
   beforeEach(() => {
     request = {
@@ -31,6 +38,8 @@ describe('Auth Controller', () => {
       json: sinon.stub().returnsThis(),
     };
     userStub = sinon.stub(User.prototype, 'save');
+    addDefaultCategoriesStub = sinon.stub(Category, 'insertMany');
+    addDefaultPaymentModesStub = sinon.stub(PaymentMode, 'insertMany');
     jwtStub = sinon.stub(jwt, 'sign');
     sinon.stub(logger, 'info');
     sinon.stub(logger, 'error');
@@ -43,6 +52,8 @@ describe('Auth Controller', () => {
   describe('register', () => {
     it('should register a new user and return a token', async () => {
       userStub.resolves();
+      addDefaultCategoriesStub.resolves();
+      addDefaultPaymentModesStub.resolves();
       jwtStub.returns('validToken');
       await register(request, response);
 
@@ -56,6 +67,7 @@ describe('Auth Controller', () => {
 
     it('should return 500 if there is an error during registration', async () => {
       userStub.rejects(new Error('Save failed'));
+
       await register(request, response);
 
       expect(logger.error).to.have.been
