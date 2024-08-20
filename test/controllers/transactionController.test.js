@@ -20,6 +20,7 @@ const mockTransaction = {
   remark: 'Test',
   type: 'expense',
   category: '60d21b4667d0d8992e610c85',
+  paymentMode: '66bb354ab83d97ec675dfd39',
   date: '2024-06-07',
   user: mockUser.id,
 };
@@ -41,11 +42,11 @@ describe('Transaction Controller', () => {
   let response;
   let saveTransactionStub;
   let saveCategoryStub;
+  let savePaymentModeStub;
   let findTransactionStub;
   let findOneCategoryStub;
   let findOnePaymentModeStub;
   let findTransactionByIdStub;
-  let findCategoryByIdStub;
   let deleteOneStub;
 
   beforeEach(() => {
@@ -61,11 +62,11 @@ describe('Transaction Controller', () => {
     sinon.stub(logger, 'error');
     saveTransactionStub = sinon.stub(Transaction.prototype, 'save');
     saveCategoryStub = sinon.stub();
+    savePaymentModeStub = sinon.stub();
     findTransactionStub = sinon.stub(Transaction, 'find');
     findOneCategoryStub = sinon.stub(Category, 'findOne');
     findOnePaymentModeStub = sinon.stub(PaymentMode, 'findOne');
     findTransactionByIdStub = sinon.stub(Transaction, 'findById');
-    findCategoryByIdStub = sinon.stub(Category, 'findById');
     deleteOneStub = sinon.stub(Transaction.prototype, 'deleteOne');
   });
 
@@ -77,9 +78,10 @@ describe('Transaction Controller', () => {
     it('should add a transaction and return 201', async () => {
       const mockResponse = { ...mockTransaction, _id: mockUser.id };
       findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
-      findOnePaymentModeStub.resolves({ ...mockPaymentMode });
+      findOnePaymentModeStub.resolves({ ...mockPaymentMode, save: savePaymentModeStub });
       saveTransactionStub.resolves(mockResponse);
       saveCategoryStub.resolves(mockCategory);
+      savePaymentModeStub.resolves(mockPaymentMode);
       response.json.returns(mockResponse);
 
       const res = await addTransaction(request, response);
@@ -111,8 +113,9 @@ describe('Transaction Controller', () => {
 
     it('should return 500 if there is an error', async () => {
       findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
-      findOnePaymentModeStub.resolves({ ...mockPaymentMode });
+      findOnePaymentModeStub.resolves({ ...mockPaymentMode, save: savePaymentModeStub });
       saveCategoryStub.resolves(mockCategory);
+      savePaymentModeStub.resolves(mockPaymentMode);
       saveTransactionStub.rejects(new Error('Database error'));
       response.json.returns(new Error('Database error'));
 
@@ -178,7 +181,8 @@ describe('Transaction Controller', () => {
     it('should update a transaction and return 200', async () => {
       const saveTransaction = sinon.stub();
       findTransactionByIdStub.resolves({ ...transaction, save: saveTransaction });
-      findCategoryByIdStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      findOnePaymentModeStub.resolves({ ...mockPaymentMode, save: savePaymentModeStub });
       const mockResponse = { ...mockTransaction, _id: mockUser.id };
       saveTransactionStub.resolves(mockResponse);
 
@@ -186,7 +190,7 @@ describe('Transaction Controller', () => {
 
       expect(response.status).to.have.been.calledWith(200);
       expect(saveCategoryStub).to.have.been.calledBefore(saveTransaction);
-      expect(saveCategoryStub).to.have.been.calledAfter(saveTransaction);
+      expect(savePaymentModeStub).to.have.been.calledBefore(saveTransaction);
     });
 
     it('should return 404 if transaction not found', async () => {
@@ -198,7 +202,8 @@ describe('Transaction Controller', () => {
       expect(response.status).to.have.been.calledWith(404);
       expect(logger.error).to.have.been
         .calledWith(
-          `Unable to update transactions for user: ${mockUser.id}, Error: ${id} does not exist`,
+          `Unable to update transactions for user: ${mockUser.id},
+        Error: Transaction ${id} does not exist`,
         );
       expect(response.json).to.have.been.calledWith({
         error: {
@@ -265,7 +270,8 @@ describe('Transaction Controller', () => {
     it('should delete a transaction and return 200', async () => {
       const deleteOne = sinon.stub();
       findTransactionByIdStub.resolves({ ...mockTransaction, deleteOne });
-      findCategoryByIdStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      findOneCategoryStub.resolves({ ...mockCategory, save: saveCategoryStub });
+      findOnePaymentModeStub.resolves({ ...mockPaymentMode, save: savePaymentModeStub });
       deleteOneStub.resolves();
 
       await deleteTransaction(deleteRequest, response);
@@ -283,7 +289,8 @@ describe('Transaction Controller', () => {
       expect(response.status).to.have.been.calledWith(404);
       expect(logger.error).to.have.been
         .calledWith(
-          `Unable to delete transaction ${id} for user ${mockUser.id}, Error: ${id} does not exist`,
+          `Unable to delete transaction ${id} for user ${mockUser.id},
+        Error: Transaction ${id} does not exist`,
         );
       expect(response.json).to.have.been.calledWith({
         error: {

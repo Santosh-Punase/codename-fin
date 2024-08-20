@@ -25,6 +25,11 @@ const transactionValidationRules = [
     .withMessage(VALIDATION_ERROR_CODES.CATEGORY_IS_REQUIRED)
     .isMongoId()
     .withMessage(VALIDATION_ERROR_CODES.INVALID_CATEGORY),
+  body('paymentMode')
+    .exists()
+    .withMessage(VALIDATION_ERROR_CODES.PAYMENT_MODE_IS_REQUIRED)
+    .isMongoId()
+    .withMessage(VALIDATION_ERROR_CODES.INVALID_PAYMENT_MODE),
 ];
 
 const validateTransaction = (req, res, next) => {
