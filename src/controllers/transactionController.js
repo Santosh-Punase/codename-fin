@@ -6,6 +6,7 @@ import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
 import { TRANSACTION_TYPE } from '../config/contants.js';
+import { getTransactionDateFilters } from '../utils/index.js';
 
 const DEFAULT_DATE = new Date().toISOString();
 
@@ -71,7 +72,7 @@ export const addTransaction = async (req, res) => {
 
 export const getTransactions = async (req, res) => {
   const {
-    page = 1, limit = 10, type, categories, paymentModes,
+    page = 1, limit = 10, type, categories, paymentModes, period, startDate, endDate,
   } = req.query;
 
   const filter = { user: req.user.id };
@@ -79,11 +80,16 @@ export const getTransactions = async (req, res) => {
   if (categories) filter.category = { $in: categories.split(',') };
   if (paymentModes) filter.paymentMode = { $in: paymentModes.split(',') };
 
+  const dateFilter = getTransactionDateFilters(period, startDate, endDate);
+  if (Object.keys(dateFilter).length) {
+    filter.date = dateFilter;
+  }
+
   try {
     const transactions = await Transaction.find(filter)
       .populate('category', 'name')
       .populate('paymentMode', 'name')
-      .sort({ updatedAt: -1 })
+      .sort({ date: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
 

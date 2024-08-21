@@ -32,7 +32,7 @@ const TransactionSchema = new mongoose.Schema({
     ref: 'PaymentMode',
   },
   date: {
-    type: String,
+    type: Date,
     required: true,
   },
 }, { timestamps: true });
