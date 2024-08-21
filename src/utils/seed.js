@@ -1,21 +1,23 @@
+import { CATEGORY_TYPE } from '../config/contants.js';
+
 export const defaultCategories = [
   {
-    name: 'Groceries', type: 'Expense', budget: 0, expenditure: 0,
+    name: 'Groceries', type: CATEGORY_TYPE.EXPENSE, budget: 0, expenditure: 0,
   },
   {
-    name: 'Rent', type: 'Expense', budget: 0, expenditure: 0,
+    name: 'Rent', type: CATEGORY_TYPE.EXPENSE, budget: 0, expenditure: 0,
   },
   {
-    name: 'Commute', type: 'Expense', budget: 0, expenditure: 0,
+    name: 'Commute', type: CATEGORY_TYPE.EXPENSE, budget: 0, expenditure: 0,
   },
   {
-    name: 'Utilities', type: 'Expense', budget: 0, expenditure: 0,
+    name: 'Utilities', type: CATEGORY_TYPE.EXPENSE, budget: 0, expenditure: 0,
   },
   {
-    name: 'Salary', type: 'Income', budget: 0, expenditure: 0,
+    name: 'Salary', type: CATEGORY_TYPE.INCOME, budget: 0, expenditure: 0,
   },
   {
-    name: 'Other', type: 'Expense', budget: 0, expenditure: 0,
+    name: 'Other', type: CATEGORY_TYPE.EXPENSE, budget: 0, expenditure: 0,
   },
 ];
 
