@@ -114,6 +114,12 @@ export const resetData = async (req, res) => {
       const defaultCategoriesWithUser = defaultCategories
         .map((category) => ({ ...category, user: userId }));
       await Category.insertMany(defaultCategoriesWithUser);
+    } else {
+      // Reset expenditure to 0 for all categories if resetCategories is not provided
+      await Category.updateMany(
+        { user: userId },
+        { $set: { expenditure: 0 } },
+      );
     }
 
     return res.status(200).json({ message: 'Reset completed successfully.' });
