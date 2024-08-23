@@ -54,6 +54,8 @@ const ERROR = {
   DELETE_CATEGORY_FAILED: VALIDATION_ERROR.DEFAULT,
   DELETE_FAILED_CATEGORY_DOES_NOT_EXIST: 'This category does not exist',
   DELETE_FAILED_CATEGORY_UNAUTHORIZED: 'You are not allowed to delete this category',
+  INVALID_BUDGETS: 'Budgets array is required and should not be empty.',
+  BUDGET_UPDATE_FAILED: VALIDATION_ERROR.DEFAULT,
 
   ADD_PAYMENT_MODE_FAILED: VALIDATION_ERROR.DEFAULT,
   GET_PAYMENT_MODE_FAILED: 'No payment modes found',

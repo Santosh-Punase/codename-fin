@@ -141,3 +141,42 @@ export const deleteCategory = async (req, res) => {
     });
   }
 };
+
+export const setBudget = async (req, res) => {
+  const userId = req.user._id;
+  const { budgets } = req.body;
+
+  try {
+    if (!budgets || !Array.isArray(budgets) || budgets.length === 0) {
+      logger.error(`Unable to set budget for user ${userId}, Err: Invalid Budget`);
+      return res.status(400).json({
+        error: {
+          code: ERROR_CODES.INVALID_BUDGETS,
+          message: ERROR.INVALID_BUDGETS,
+        },
+      });
+    }
+
+    const bulkOperations = budgets.map((budget) => ({
+      updateOne: {
+        filter: { _id: budget.categoryId, user: userId },
+        update: { $set: { budget: budget.amount } },
+      },
+    }));
+
+    const result = await Category.bulkWrite(bulkOperations);
+
+    return res.status(200).json({
+      message: 'Budgets updated successfully.',
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (err) {
+    logger.error(`Unable to update budgets for user ${userId}, ${err}`);
+    return res.status(500).json({
+      error: {
+        code: ERROR_CODES.BUDGET_UPDATE_FAILED,
+        message: ERROR.BUDGET_UPDATE_FAILED,
+      },
+    });
+  }
+};
