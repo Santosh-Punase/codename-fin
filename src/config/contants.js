@@ -34,3 +34,11 @@ export const PAYMENT_MODE_TYPES = [
   PAYMENT_MODE_TYPE.WALLET,
   PAYMENT_MODE_TYPE.CREDIT_CARD,
 ];
+
+export const GENDER_TYPE = {
+  MALE: 'Male',
+  FEMALE: 'Female',
+  Other: 'Other',
+};
+
+export const GENDER_TYPES = [GENDER_TYPE.MALE, GENDER_TYPE.FEMALE, GENDER_TYPE.Other];

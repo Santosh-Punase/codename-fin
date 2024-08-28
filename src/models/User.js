@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-import { SALT_ROUND } from '../config/contants.js';
+import { GENDER_TYPES, SALT_ROUND } from '../config/contants.js';
 
 const currencySchema = new mongoose.Schema({
   name: {
@@ -35,6 +35,13 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+  },
+  gender: {
+    type: String,
+    enum: GENDER_TYPES,
+  },
+  birthDate: {
+    type: Date,
   },
   currency: {
     type: currencySchema,

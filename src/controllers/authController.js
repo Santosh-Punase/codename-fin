@@ -57,7 +57,9 @@ export const login = async (req, res) => {
 export const getUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const user = await User.findById(userId).select(['username', 'email', 'currency']);
+    const user = await User.findById(userId).select(
+      ['username', 'email', 'currency', 'gender', 'birthDate'],
+    );
     if (!user) {
       return res.status(404).json({
         error: {
@@ -65,7 +67,14 @@ export const getUser = async (req, res) => {
         },
       });
     }
-    return res.json({ username: user.username, email: user.email, currency: user.currency });
+
+    return res.json({
+      username: user.username,
+      email: user.email,
+      currency: user.currency,
+      gender: user.gender,
+      birthDate: user.birthDate,
+    });
   } catch (err) {
     return res.status(500).json({
       error: {
@@ -78,7 +87,9 @@ export const getUser = async (req, res) => {
 export const updateUser = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { username, password, currency } = req.body;
+    const {
+      username, password, currency, gender, birthDate,
+    } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -93,9 +104,17 @@ export const updateUser = async (req, res) => {
     if (username) user.username = username;
     if (password) user.password = password;
     if (currency) user.currency = currency;
+    if (gender) user.gender = gender;
+    if (birthDate) user.birthDate = birthDate;
 
     await user.save();
-    return res.json({ username: user.username, email: user.email, currency: user.currency });
+    return res.json({
+      username: user.username,
+      email: user.email,
+      currency: user.currency,
+      gender: user.gender,
+      birthDate: user.birthDate,
+    });
   } catch (err) {
     return res.status(500).json({
       error: {
