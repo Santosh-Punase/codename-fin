@@ -7,7 +7,7 @@ import { expect, use } from 'chai';
 import User from '../../src/models/User.js';
 import logger from '../../src/utils/logger.js';
 import {
-  JWT_SECRET, TEST_USER_EMAIL, TEST_USER_NAME, TEST_USER_PASSWORD,
+  JWT_SECRET, TEST_USER_EMAIL, TEST_USER_NAME, TEST_USER_PASSWORD, JWT_EXPIRY,
 } from '../../src/config/env.js';
 import { ERROR_CODES } from '../../src/const/errorCodes.js';
 import { ERROR } from '../../src/const/errorMessages.js';
@@ -59,7 +59,7 @@ describe('Auth Controller', () => {
 
       expect(userStub).to.have.been.calledOnce;
       expect(jwtStub).to.have.been
-        .calledWith({ id: sinon.match.any }, JWT_SECRET, { expiresIn: '1h' });
+        .calledWith({ id: sinon.match.any }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
       expect(logger.info).to.have.been.calledWith(`New user created ${request.body.email}`);
       expect(response.status).to.have.been.calledWith(201);
       expect(response.json).to.have.been.calledWith({ token: 'validToken' });
@@ -103,7 +103,7 @@ describe('Auth Controller', () => {
       expect(User.findOne).to.have.been.calledWith({ email: request.body.email });
       expect(mockUser.matchPassword).to.have.been.calledWith(request.body.password);
       expect(jwtStub).to.have.been
-        .calledWith({ id: mockUser._id }, JWT_SECRET, { expiresIn: '1h' });
+        .calledWith({ id: mockUser._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
       expect(response.status).to.have.been.calledWith(200);
       expect(response.json).to.have.been.calledWith({ token: 'validToken' });
     });
