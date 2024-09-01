@@ -115,6 +115,11 @@ const paymentModeErrorHandler = (error) => {
         code: error.msg,
         message: VALIDATION_ERROR.INVALID_PAYMENT_MODE_TYPE,
       });
+    case 'bankAccount':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_PAYMENT_MODE_BANK_ACCOUNT,
+      });
     default:
       return ({
         code: VALIDATION_ERROR_CODES.DEFAULT,

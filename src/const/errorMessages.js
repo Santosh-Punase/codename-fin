@@ -23,6 +23,7 @@ const VALIDATION_ERROR = {
   INVALID_PAYMENT_MODE_NAME: 'Please Enter a valid Name',
   INVALID_BALANCE: 'Please Enter a valid Balance',
   INVALID_PAYMENT_MODE_TYPE: 'Please enter a valid type',
+  INVALID_PAYMENT_MODE_BANK_ACCOUNT: 'Please enter a valid bank account',
 
   INVALID_BANK_ACCOUNT_NAME: 'Please Enter a valid Name',
   INVALID_BANK_BALANCE: 'Please Enter a valid Balance',
@@ -68,6 +69,7 @@ const ERROR = {
   DELETE_PAYMENT_MODE_FAILED: VALIDATION_ERROR.DEFAULT,
   DELETE_FAILED_PAYMENT_MODE_DOES_NOT_EXIST: 'This payment mode does not exist',
   DELETE_FAILED_PAYMENT_MODE_UNAUTHORIZED: 'You are not allowed to delete this payment mode',
+  BANK_ACCOUNT_NOT_FOUND: 'Bank account not found',
 
   ADD_BANK_ACCOUNT_FAILED: VALIDATION_ERROR.DEFAULT,
   GET_BANK_ACCOUNT_FAILED: 'No bank account found',
