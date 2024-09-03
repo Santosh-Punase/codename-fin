@@ -43,7 +43,7 @@ describe('Transaction Routes', () => {
     const pMode = new PaymentMode({
       name: 'Online',
       balance: 500,
-      type: PAYMENT_MODE_TYPE.BANK,
+      type: PAYMENT_MODE_TYPE.CASH,
       user: userId,
     });
     await category.save();
@@ -77,7 +77,7 @@ describe('Transaction Routes', () => {
           expect(res.body).to.have.property('amount', 100);
           expect(res.body).to.have.property('type', TRANSACTION_TYPE.EXPENSE);
           expect(res.body).to.have.property('remark', 'Test transaction');
-          expect(res.body).to.have.property('category', categoryId.toString());
+          expect(res.body).to.have.property('category', 'Entertainment');
           done();
         });
     });
@@ -155,14 +155,14 @@ describe('Transaction Routes', () => {
     });
   });
 
-  describe.skip('GET /api/transactions', () => {
+  describe('GET /api/transactions', () => {
     it('should get all transactions for the user', (done) => {
       server.request(app)
         .get('/api/transactions')
         .set('Authorization', token)
         .end((_err, res) => {
           expect(res).to.have.status(200);
-          expect(res.body).to.be.an('array');
+          expect(res.body.transactions).to.be.an('array');
           done();
         });
     });

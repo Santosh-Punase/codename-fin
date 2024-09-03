@@ -41,12 +41,9 @@ const ERROR = {
 
   ADD_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
   GET_TRANSACTION_FAILED: 'No transactions found',
+  TRANSACTION_NOT_FOUND: 'Transaction not found',
   UPDATE_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
-  UPDATE_FAILED_TRANSACTION_DOES_NOT_EXIST: 'This transaction does not exist',
-  UPDATE_FAILED_TRANSACTION_UNAUTHORIZED: 'You are not allowed to update this transaction',
   DELETE_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
-  DELETE_FAILED_TRANSACTION_DOES_NOT_EXIST: 'This transaction does not exist',
-  DELETE_FAILED_TRANSACTION_UNAUTHORIZED: 'You are not allowed to delete this transaction',
   CATEGORY_NOT_FOUND: 'Category not found',
   PAYMENT_MODE_NOT_FOUND: 'Payment mode not found',
 
