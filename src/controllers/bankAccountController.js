@@ -3,6 +3,7 @@ import BankAccount from '../models/BankAccount.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
+import PaymentMode from '../models/PaymentMode.js';
 
 export const addBankAccount = async (req, res) => {
   const { name, balance } = req.body;
@@ -100,11 +101,13 @@ export const updateBankAccount = async (req, res) => {
 
 export const deleteBankAccount = async (req, res) => {
   const { id } = req.params;
+  const userId = req.user.id;
+
   try {
     const bankAccount = await BankAccount.findById(id);
     if (!bankAccount) {
       logger.error(
-        `Unable to delete bank account ${id} for user ${req.user.id}, Error: ${id} does not exist`,
+        `Unable to delete bank account ${id} for user ${userId}, Error: ${id} does not exist`,
       );
       return res.status(404).json({
         error: {
@@ -114,9 +117,9 @@ export const deleteBankAccount = async (req, res) => {
         },
       });
     }
-    if (bankAccount.user.toString() !== req.user.id) {
+    if (bankAccount.user.toString() !== userId) {
       logger.error(
-        `Unable to delete bank account ${id}, Error: user ${req.user.id} is not authorised`,
+        `Unable to delete bank account ${id}, Error: user ${userId} is not authorised`,
       );
       return res.status(401).json({
         error: {
@@ -125,10 +128,24 @@ export const deleteBankAccount = async (req, res) => {
         },
       });
     }
+
+    const linkedPaymentMode = await PaymentMode.findOne({ user: userId, bankAccount: id });
+    if (linkedPaymentMode) {
+      logger.error(
+        `Unable to delete bank account ${id} for user ${userId}, Error: Account linked`,
+      );
+      return res.status(409).json({
+        error: {
+          code: ERROR_CODES.DELETE_FAILED_BANK_ACCOUNT_LINKED,
+          message: ERROR.DELETE_FAILED_BANK_ACCOUNT_LINKED,
+        },
+      });
+    }
+
     await bankAccount.deleteOne();
     return res.status(200).json({ message: 'Bank account deleted' });
   } catch (err) {
-    logger.error(`Unable to delete bank account ${id} for user ${req.user.id}, ${err}`);
+    logger.error(`Unable to delete bank account ${id} for user ${userId}, ${err}`);
     return res.status(500).json({
       error: {
         code: ERROR_CODES.DELETE_BANK_ACCOUNT_FAILED,

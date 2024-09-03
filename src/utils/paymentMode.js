@@ -4,6 +4,14 @@ import { PAYMENT_MODE_TYPE, TRANSACTION_TYPE } from '../config/contants.js';
 
 export const isBankLinkedPaymentMode = (pmodeType) => pmodeType === PAYMENT_MODE_TYPE.BANK;
 
+export const validateBankAccount = async (bankAccountId, userId) => {
+  const bankAccount = await BankAccount.findOne({ _id: bankAccountId, user: userId });
+  if (!bankAccount) {
+    throw new Error('BANK_ACCOUNT_NOT_FOUND');
+  }
+  return bankAccount;
+};
+
 export const validatePaymentMode = async (paymentModeId, userId) => {
   const paymentMode = await PaymentMode.findOne({ _id: paymentModeId, user: userId });
   if (!paymentMode) {

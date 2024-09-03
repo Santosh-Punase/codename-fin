@@ -76,6 +76,7 @@ const ERROR = {
   DELETE_BANK_ACCOUNT_FAILED: VALIDATION_ERROR.DEFAULT,
   DELETE_FAILED_BANK_ACCOUNT_DOES_NOT_EXIST: 'This bank account does not exist',
   DELETE_FAILED_BANK_ACCOUNT_UNAUTHORIZED: 'You are not allowed to delete this bank account',
+  DELETE_FAILED_BANK_ACCOUNT_LINKED: 'Account linked with Payment mode can not be deleted',
 
   RESET_ACCOUNT_DATA_FAILED_NO_PARAMS:
     'No reset parameters provided. Please specify at least one reset option.',
