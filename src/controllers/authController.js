@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken';
 
 import User from '../models/User.js';
-import Category from '../models/Category.js';
-import PaymentMode from '../models/PaymentMode.js';
 
 import { JWT_SECRET, JWT_EXPIRY } from '../config/env.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
-import { defaultCategories, defaultPaymentModes } from '../utils/seed.js';
+import {
+  initialiseWithDefaultCategories,
+  initialiseWithDefaultPaymentModes,
+} from '../utils/user.js';
 
 export const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -18,12 +19,10 @@ export const register = async (req, res) => {
     await user.save();
 
     // Create default categories
-    const categories = defaultCategories.map((category) => ({ ...category, user: user._id }));
-    await Category.insertMany(categories);
+    await initialiseWithDefaultCategories(user._id);
 
     // Create default payment modes
-    const paymentModes = defaultPaymentModes.map((mode) => ({ ...mode, user: user._id }));
-    await PaymentMode.insertMany(paymentModes);
+    await initialiseWithDefaultPaymentModes(user._id);
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY || '1h' });
     logger.info(`New user created ${email}`);
