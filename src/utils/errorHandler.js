@@ -115,6 +115,11 @@ const paymentModeErrorHandler = (error) => {
         code: error.msg,
         message: VALIDATION_ERROR.INVALID_PAYMENT_MODE_TYPE,
       });
+    case 'bankAccount':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_PAYMENT_MODE_BANK_ACCOUNT,
+      });
     default:
       return ({
         code: VALIDATION_ERROR_CODES.DEFAULT,
@@ -143,10 +148,37 @@ const otpErrorHandler = (error) => {
   }
 };
 
+const bankAccountErrorHandler = (error) => {
+  switch (error.path) {
+    case 'name':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_BANK_ACCOUNT_NAME,
+      });
+    case 'balance':
+      if (error.msg === VALIDATION_ERROR_CODES.BANK_ACCOUNT_BALANCE_IS_REQUIRED) {
+        return ({
+          code: VALIDATION_ERROR_CODES.BANK_ACCOUNT_BALANCE_IS_REQUIRED,
+          message: VALIDATION_ERROR.INVALID_BANK_BALANCE,
+        });
+      }
+      return ({
+        code: VALIDATION_ERROR_CODES.INVALID_BANK_BALANCE,
+        message: VALIDATION_ERROR.INVALID_BANK_BALANCE,
+      });
+    default:
+      return ({
+        code: VALIDATION_ERROR_CODES.DEFAULT,
+        message: VALIDATION_ERROR.DEFAULT,
+      });
+  }
+};
+
 export {
   userErrorHandler,
   transactionErrorHandler,
   categoryErrorHandler,
   paymentModeErrorHandler,
   otpErrorHandler,
+  bankAccountErrorHandler,
 };

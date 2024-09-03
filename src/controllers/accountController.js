@@ -6,7 +6,12 @@ import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
 import { TRANSACTION_TYPE } from '../config/contants.js';
-import { defaultCategories, defaultPaymentModes } from '../utils/seed.js';
+import {
+  deleteAllCategories,
+  deleteAllPaymentModes,
+  initialiseWithDefaultCategories,
+  initialiseWithDefaultPaymentModes, resetCategoriesExpenditure,
+} from '../utils/user.js';
 
 export const getAccountSummary = async (req, res) => {
   try {
@@ -99,27 +104,21 @@ export const resetData = async (req, res) => {
 
     // Reset Payment Modes
     if (resetPaymentModes === 'true') {
-      await PaymentMode.deleteMany({ user: userId });
+      await deleteAllPaymentModes(userId);
 
       // Insert default payment modes
-      const defaultModesWithUser = defaultPaymentModes.map((mode) => ({ ...mode, user: userId }));
-      await PaymentMode.insertMany(defaultModesWithUser);
+      await initialiseWithDefaultPaymentModes(userId);
     }
 
     // Reset Categories
     if (resetCategories === 'true') {
-      await Category.deleteMany({ user: userId });
+      await deleteAllCategories(userId);
 
       // Insert default categories
-      const defaultCategoriesWithUser = defaultCategories
-        .map((category) => ({ ...category, user: userId }));
-      await Category.insertMany(defaultCategoriesWithUser);
+      await initialiseWithDefaultCategories(userId);
     } else {
       // Reset expenditure to 0 for all categories if resetCategories is not provided
-      await Category.updateMany(
-        { user: userId },
-        { $set: { expenditure: 0 } },
-      );
+      await resetCategoriesExpenditure(userId);
     }
 
     return res.status(200).json({ message: 'Reset completed successfully.' });

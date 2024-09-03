@@ -1,12 +1,20 @@
 import Transaction from '../models/Transaction.js';
-import Category from '../models/Category.js';
-import PaymentMode from '../models/PaymentMode.js';
 
 import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
-import { TRANSACTION_TYPE } from '../config/contants.js';
 import { getTransactionDateFilters } from '../utils/index.js';
+import {
+  validatePaymentMode,
+  updatePaymentModeAmount,
+  revertPaymentModeAmount,
+} from '../utils/paymentMode.js';
+import {
+  createTransaction,
+  transactionErrorResponse,
+  validateTransaction,
+} from '../utils/transaction.js';
+import { validateCategory, updateCategoryAmount } from '../utils/category.js';
 
 const DEFAULT_DATE = new Date().toISOString();
 
@@ -14,58 +22,34 @@ export const addTransaction = async (req, res) => {
   const {
     amount, remark, category: categoryId, type, paymentMode: paymentModeId, date = DEFAULT_DATE,
   } = req.body;
+  const userId = req.user.id;
+
   try {
-    // Check if the category exists and belongs to the user
-    const category = await Category.findOne({ _id: categoryId, user: req.user.id });
+    const category = await validateCategory(categoryId, userId);
+    const [paymentMode, bankAccount] = await validatePaymentMode(paymentModeId, userId);
 
-    if (!category) {
-      logger.error(
-        `Unable to add transaction for user: ${req.user.id}, category not found: ${categoryId}`,
-      );
-      return res.status(404).json({
-        error: { code: ERROR_CODES.CATEGORY_NOT_FOUND, message: ERROR.CATEGORY_NOT_FOUND },
-      });
-    }
+    await updateCategoryAmount(category, amount);
+    await updatePaymentModeAmount(paymentMode, type, amount, bankAccount);
 
-    const paymentMode = await PaymentMode.findOne({ _id: paymentModeId, user: req.user.id });
-
-    if (!paymentMode) {
-      logger.error(
-        `Unable to add transaction for user: ${req.user.id},
-        payment mode not found: ${paymentModeId}`,
-      );
-      return res.status(404).json({
-        error: { code: ERROR_CODES.PAYMENT_MODE_NOT_FOUND, message: ERROR.PAYMENT_MODE_NOT_FOUND },
-      });
-    }
-
-    category.expenditure += amount;
-
-    if (type === TRANSACTION_TYPE.EXPENSE) {
-      paymentMode.balance -= amount;
-    } else {
-      paymentMode.balance += amount;
-    }
-
-    await paymentMode.save();
-    await category.save();
-
-    const transaction = new Transaction({
-      user: req.user.id,
-      amount,
-      remark,
-      type,
-      date,
-      category: categoryId,
-      paymentMode: paymentModeId,
+    const transaction = await createTransaction({
+      userId, amount, remark, type, date, categoryId, paymentModeId,
     });
-    await transaction.save();
 
-    return res.status(201).json(transaction);
+    return res.status(201).json({
+      ...transaction,
+      category: category.name,
+      paymentMode: paymentMode.name,
+    });
   } catch (err) {
-    logger.error(`Unable to add transaction for user: ${req.user.id}, ${err}`);
-    return res.status(500).json({
-      error: { code: ERROR_CODES.ADD_TRANSACTION_FAILED, message: ERROR.ADD_TRANSACTION_FAILED },
+    const {
+      statusCode,
+      errorCode,
+      errorMessage,
+    } = transactionErrorResponse(err.message, 'ADD_TRANSACTION_FAILED');
+
+    logger.error(`Unable to add transaction for user: ${userId}, ${err}`);
+    return res.status(statusCode).json({
+      error: { code: errorCode, message: errorMessage },
     });
   }
 };
@@ -128,98 +112,71 @@ export const updateTransaction = async (req, res) => {
   const { id } = req.params;
   const {
     amount, remark, category: newCategoryId, type,
-    paymentMode: newPaymentModeId, date = DEFAULT_DATE,
+    paymentMode: newPaymentModeId, date,
   } = req.body;
-  const user = req.user.id;
+  const userId = req.user.id;
   try {
-    const transaction = await Transaction.findById(id);
+    const transaction = await validateTransaction(id, userId);
+    const {
+      category: oldCategoryId,
+      paymentMode: oldPaymentModeId,
+      type: oldType,
+      amount: oldAmount,
+    } = transaction;
+    let updatedCategoryId = oldCategoryId;
+    let updatedPaymentModeId = oldPaymentModeId;
 
-    if (!transaction) {
-      logger.error(
-        `Unable to update transactions for user: ${user},
-        Error: Transaction ${id} does not exist`,
-      );
-      return res.status(404).json({
-        error: {
-          code: ERROR_CODES.UPDATE_FAILED_TRANSACTION_DOES_NOT_EXIST,
-          message: ERROR.UPDATE_FAILED_TRANSACTION_DOES_NOT_EXIST,
-        },
-      });
-    }
-    if (transaction.user.toString() !== user) {
-      logger.error(
-        `Unable to update transaction ${id}, Error: user ${user} is not authorised`,
-      );
-      return res.status(401).json({
-        error: {
-          code: ERROR_CODES.UPDATE_FAILED_TRANSACTION_UNAUTHORIZED,
-          message: ERROR.UPDATE_FAILED_TRANSACTION_UNAUTHORIZED,
-        },
-      });
+    // Revert old transaction effects on category and apply new transaction effects
+    if (!oldCategoryId.equals(newCategoryId) || oldType !== type) {
+      const oldCategory = await validateCategory(oldCategoryId, userId);
+      const newCategory = await validateCategory(newCategoryId, userId);
+
+      await updateCategoryAmount(oldCategory, -oldAmount);
+      await updateCategoryAmount(newCategory, amount);
+      updatedCategoryId = newCategoryId;
+    } else if (oldAmount !== amount) {
+      const oldCategory = await validateCategory(oldCategoryId, userId);
+
+      await updateCategoryAmount(oldCategory, -oldAmount + amount);
     }
 
-    const newCategory = await Category.findOne({ _id: newCategoryId, user });
-    if (!newCategory) {
-      logger.error(
-        `Unable to update transaction for user: ${user},
-        category not found: ${newCategoryId}`,
-      );
-      return res.status(404).json({
-        error: { code: ERROR_CODES.CATEGORY_NOT_FOUND, message: ERROR.CATEGORY_NOT_FOUND },
-      });
-    }
-    const newPaymentMode = await PaymentMode.findOne({ _id: newPaymentModeId, user });
-    if (!newPaymentMode) {
-      logger.error(
-        `Unable to update transaction for user: ${user},
-        payment mode not found: ${newPaymentModeId}`,
-      );
-      return res.status(404).json({
-        error: { code: ERROR_CODES.PAYMENT_MODE_NOT_FOUND, message: ERROR.PAYMENT_MODE_NOT_FOUND },
-      });
-    }
+    // Revert old transaction effects on payment mode and apply new transaction effects
+    if (!oldPaymentModeId.equals(newPaymentModeId)) {
+      const [oldPaymentMode, oldBankAccount] = await validatePaymentMode(oldPaymentModeId, userId);
+      const [newPaymentMode, newBankAccount] = await validatePaymentMode(newPaymentModeId, userId);
 
-    const oldCategory = await Category.findOne({ _id: transaction.category, user });
-    const oldPaymentMode = await PaymentMode.findOne({ _id: transaction.paymentMode, user });
+      await revertPaymentModeAmount(oldPaymentMode, oldType, oldAmount, oldBankAccount);
+      await updatePaymentModeAmount(newPaymentMode, type, amount, newBankAccount);
+      updatedPaymentModeId = newPaymentModeId;
+    } else if (oldAmount !== amount || oldType !== type) {
+      const [oldPaymentMode, oldBankAccount] = await validatePaymentMode(oldPaymentModeId, userId);
 
-    // Revert old transaction effects
-    oldCategory.expenditure -= transaction.amount;
-    if (transaction.type === 'income') {
-      oldPaymentMode.balance -= transaction.amount;
-    } else if (transaction.type === 'expense') {
-      oldPaymentMode.balance += transaction.amount;
+      await revertPaymentModeAmount(oldPaymentMode, oldType, oldAmount, oldBankAccount);
+      await updatePaymentModeAmount(oldPaymentMode, type, amount, oldBankAccount);
     }
-
-    // Apply new transaction effects
-    newCategory.expenditure += amount;
-    if (type === 'income') {
-      newPaymentMode.balance += amount;
-    } else if (type === 'expense') {
-      newPaymentMode.balance -= amount;
-    }
-
-    // Save the updated payment modes and categories
-    await oldPaymentMode.save();
-    await oldCategory.save();
-    await newPaymentMode.save();
-    await newCategory.save();
 
     transaction.amount = amount;
     transaction.remark = remark;
     transaction.type = type;
-    transaction.category = newCategoryId;
-    transaction.paymentMode = newPaymentModeId;
+    transaction.category = updatedCategoryId;
+    transaction.paymentMode = updatedPaymentModeId;
     transaction.date = date;
 
     await transaction.save();
 
     return res.status(200).json(transaction);
   } catch (err) {
-    logger.error(`Unable to update transaction ${id} for user ${user}, ${err}`);
-    return res.status(500).json({
+    const {
+      statusCode,
+      errorCode,
+      errorMessage,
+    } = transactionErrorResponse(err.message, 'UPDATE_TRANSACTION_FAILED');
+
+    logger.error(`Unable to update transaction ${id} for user ${userId}, ${err}`);
+    return res.status(statusCode).json({
       error: {
-        code: ERROR_CODES.UPDATE_TRANSACTION_FAILED,
-        message: ERROR.UPDATE_TRANSACTION_FAILED,
+        code: errorCode,
+        message: errorMessage,
       },
     });
   }
@@ -227,59 +184,36 @@ export const updateTransaction = async (req, res) => {
 
 export const deleteTransaction = async (req, res) => {
   const { id } = req.params;
-  const user = req.user.id;
+  const userId = req.user.id;
 
   try {
-    const transaction = await Transaction.findById(id);
-    if (!transaction) {
-      logger.error(
-        `Unable to delete transaction ${id} for user ${user},
-        Error: Transaction ${id} does not exist`,
-      );
-      return res.status(404).json({
-        error: {
-          code: ERROR_CODES.DELETE_FAILED_TRANSACTION_DOES_NOT_EXIST,
-          message: ERROR.DELETE_FAILED_TRANSACTION_DOES_NOT_EXIST,
+    const transaction = await validateTransaction(id, userId);
 
-        },
-      });
-    }
-    if (transaction.user.toString() !== user) {
-      logger.error(
-        `Unable to delete transaction ${id}, Error: user ${user} is not authorised`,
-      );
-      return res.status(401).json({
-        error: {
-          code: ERROR_CODES.DELETE_FAILED_TRANSACTION_UNAUTHORIZED,
-          message: ERROR.DELETE_FAILED_TRANSACTION_UNAUTHORIZED,
-        },
-      });
-    }
-
-    const paymentMode = await PaymentMode.findOne({ _id: transaction.paymentMode, user });
-    const category = await Category.findOne({ _id: transaction.category, user });
+    const {
+      category: categoryId, paymentMode: paymentModeId, type, amount,
+    } = transaction;
+    const category = await validateCategory(categoryId, userId);
+    const [paymentMode, bankAccount] = await validatePaymentMode(paymentModeId, userId);
 
     // Revert the transaction effects on payment mode and category
-    category.expenditure -= transaction.amount;
-    if (transaction.type === 'income') {
-      paymentMode.balance -= transaction.amount;
-    } else if (transaction.type === 'expense') {
-      paymentMode.balance += transaction.amount;
-    }
-
-    // Save the updated payment mode and category
-    await paymentMode.save();
-    await category.save();
+    await updateCategoryAmount(category, -transaction.amount);
+    await revertPaymentModeAmount(paymentMode, type, amount, bankAccount);
 
     // Delete the transaction
     await transaction.deleteOne();
     return res.status(200).json({ message: 'Transaction deleted' });
   } catch (err) {
-    logger.error(`Unable to update transaction ${id} for user ${req.user.id}, ${err}`);
-    return res.status(500).json({
+    const {
+      statusCode,
+      errorCode,
+      errorMessage,
+    } = transactionErrorResponse(err.message, 'DELETE_TRANSACTION_FAILED');
+
+    logger.error(`Unable to delete transaction ${id} for user ${userId}, ${err}`);
+    return res.status(statusCode).json({
       error: {
-        code: ERROR_CODES.DELETE_TRANSACTION_FAILED,
-        message: ERROR.DELETE_TRANSACTION_FAILED,
+        code: errorCode,
+        message: errorMessage,
       },
     });
   }

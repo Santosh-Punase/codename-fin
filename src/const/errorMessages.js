@@ -23,6 +23,10 @@ const VALIDATION_ERROR = {
   INVALID_PAYMENT_MODE_NAME: 'Please Enter a valid Name',
   INVALID_BALANCE: 'Please Enter a valid Balance',
   INVALID_PAYMENT_MODE_TYPE: 'Please enter a valid type',
+  INVALID_PAYMENT_MODE_BANK_ACCOUNT: 'Please enter a valid bank account',
+
+  INVALID_BANK_ACCOUNT_NAME: 'Please Enter a valid Name',
+  INVALID_BANK_BALANCE: 'Please Enter a valid Balance',
 };
 
 const ERROR = {
@@ -37,12 +41,9 @@ const ERROR = {
 
   ADD_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
   GET_TRANSACTION_FAILED: 'No transactions found',
+  TRANSACTION_NOT_FOUND: 'Transaction not found',
   UPDATE_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
-  UPDATE_FAILED_TRANSACTION_DOES_NOT_EXIST: 'This transaction does not exist',
-  UPDATE_FAILED_TRANSACTION_UNAUTHORIZED: 'You are not allowed to update this transaction',
   DELETE_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
-  DELETE_FAILED_TRANSACTION_DOES_NOT_EXIST: 'This transaction does not exist',
-  DELETE_FAILED_TRANSACTION_UNAUTHORIZED: 'You are not allowed to delete this transaction',
   CATEGORY_NOT_FOUND: 'Category not found',
   PAYMENT_MODE_NOT_FOUND: 'Payment mode not found',
 
@@ -65,6 +66,16 @@ const ERROR = {
   DELETE_PAYMENT_MODE_FAILED: VALIDATION_ERROR.DEFAULT,
   DELETE_FAILED_PAYMENT_MODE_DOES_NOT_EXIST: 'This payment mode does not exist',
   DELETE_FAILED_PAYMENT_MODE_UNAUTHORIZED: 'You are not allowed to delete this payment mode',
+  BANK_ACCOUNT_NOT_FOUND: 'Bank account not found',
+
+  ADD_BANK_ACCOUNT_FAILED: VALIDATION_ERROR.DEFAULT,
+  GET_BANK_ACCOUNT_FAILED: 'No bank account found',
+  UPDATE_BANK_ACCOUNT_FAILED: VALIDATION_ERROR.DEFAULT,
+  UPDATE_FAILED_BANK_ACCOUNT_DOES_NOT_EXIST: 'This bank account does not exist',
+  UPDATE_FAILED_BANK_ACCOUNT_UNAUTHORIZED: 'You are not allowed to update this bank account',
+  DELETE_BANK_ACCOUNT_FAILED: VALIDATION_ERROR.DEFAULT,
+  DELETE_FAILED_BANK_ACCOUNT_DOES_NOT_EXIST: 'This bank account does not exist',
+  DELETE_FAILED_BANK_ACCOUNT_UNAUTHORIZED: 'You are not allowed to delete this bank account',
 
   RESET_ACCOUNT_DATA_FAILED_NO_PARAMS:
     'No reset parameters provided. Please specify at least one reset option.',

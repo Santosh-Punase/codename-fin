@@ -17,9 +17,12 @@ const paymentModeSchema = new mongoose.Schema({
     enum: PAYMENT_MODE_TYPES,
     required: true,
   },
+  bankAccount: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BankAccount',
+  },
   balance: {
     type: Number,
-    required: true,
   },
 }, { timestamps: true });
 

@@ -8,6 +8,7 @@ import healthRoute from './routes/healthRoute.js';
 import transactionRoutes from './routes/transactionRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import paymentModeRoutes from './routes/paymentModeRoutes.js';
+import bankAccountRoutes from './routes/bankAccountRoutes.js';
 import otpRoutes from './routes/otpRoutes.js';
 import accountRoutes from './routes/accountRoutes.js';
 
@@ -44,5 +45,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/payment-modes', paymentModeRoutes);
+app.use('/api/bank-accounts', bankAccountRoutes);
 
 export default app;
