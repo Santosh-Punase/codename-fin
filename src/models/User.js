@@ -47,6 +47,9 @@ const UserSchema = new mongoose.Schema({
     type: currencySchema,
     required: false,
   },
+  reasons: {
+    type: String,
+  },
 }, { timestamps: true });
 
 UserSchema.pre('save', async function encrypt(next) {

@@ -80,6 +80,7 @@ const ERROR = {
 
   RESET_ACCOUNT_DATA_FAILED_NO_PARAMS:
     'No reset parameters provided. Please specify at least one reset option.',
+  DELETE_ACCOUNT_FAILED: VALIDATION_ERROR.DEFAULT,
 };
 
 export { VALIDATION_ERROR, ERROR };

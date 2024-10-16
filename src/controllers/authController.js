@@ -37,7 +37,7 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user || !(await user.matchPassword(password))) {
+    if (!user || !(await user.matchPassword(password)) || user.reasons) {
       return res.status(401)
         .json({
           error: {

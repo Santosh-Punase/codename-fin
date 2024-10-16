@@ -1,6 +1,7 @@
 import Transaction from '../models/Transaction.js';
 import Category from '../models/Category.js';
 import PaymentMode from '../models/PaymentMode.js';
+import User from '../models/User.js';
 
 import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
@@ -128,6 +129,31 @@ export const resetData = async (req, res) => {
       error: {
         code: ERROR_CODES.RESET_ACCOUNT_DATA_FAILED,
         message: err.message,
+      },
+    });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  const userId = req.user._id;
+  const { reasons = [], additionalComment = '' } = req.body;
+  try {
+    await Transaction.deleteMany({ user: userId });
+    await deleteAllPaymentModes(userId);
+    await deleteAllCategories(userId);
+    // await User.findByIdAndDelete(userId);
+    const user = await User.findById(userId);
+    user.reasons = `${reasons.join(',')} ${additionalComment}`;
+
+    await user.save();
+
+    return res.status(200).json({ message: 'Account deleted successfully.' });
+  } catch (err) {
+    logger.error(`Unable to delete account for user ${userId}, ${err}`);
+    return res.status(500).json({
+      error: {
+        code: ERROR_CODES.DELETE_ACCOUNT_FAILED,
+        message: ERROR.DELETE_ACCOUNT_FAILED,
       },
     });
   }
