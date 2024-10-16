@@ -1,25 +1,28 @@
 import Transaction from '../models/Transaction.js';
 import Category from '../models/Category.js';
 import PaymentMode from '../models/PaymentMode.js';
+import BankAccount from '../models/BankAccount.js';
 import User from '../models/User.js';
 
 import logger from '../utils/logger.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
-import { TRANSACTION_TYPE } from '../config/contants.js';
+import { CATEGORY_TYPE, TRANSACTION_TYPE } from '../config/contants.js';
 import {
   deleteAllCategories,
   deleteAllPaymentModes,
   initialiseWithDefaultCategories,
   initialiseWithDefaultPaymentModes, resetCategoriesExpenditure,
 } from '../utils/user.js';
+import { isBankLinkedPaymentMode } from '../utils/paymentMode.js';
 
 export const getAccountSummary = async (req, res) => {
   try {
     const userId = req.user._id;
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
     const transactions = await Transaction.aggregate([
-      { $match: { user: userId } },
+      { $match: { user: userId, date: { $gte: startOfMonth } } },
       {
         $group: {
           _id: '$type',
@@ -40,7 +43,7 @@ export const getAccountSummary = async (req, res) => {
     });
 
     const categories = await Category.aggregate([
-      { $match: { user: userId } },
+      { $match: { user: userId, type: CATEGORY_TYPE.EXPENSE } },
       {
         $group: {
           _id: null,
@@ -54,9 +57,24 @@ export const getAccountSummary = async (req, res) => {
     const totalExpenditure = categories[0] ? categories[0].totalExpenditure : 0;
 
     const paymentModes = await PaymentMode.find({ user: userId }).lean();
+    const bankAccountIds = paymentModes
+      .filter((mode) => isBankLinkedPaymentMode(mode.type))
+      .map((mode) => mode.bankAccount);
+
+    const bankAccounts = await BankAccount.find(
+      { _id: { $in: bankAccountIds }, user: userId },
+    ).lean();
+
+    const bankBalanceMap = bankAccounts.reduce((map, account) => {
+      // eslint-disable-next-line no-param-reassign
+      map[account._id] = account.balance;
+      return map;
+    }, {});
+
     const paymentModeBalances = paymentModes.map((mode) => ({
       name: mode.name,
-      balance: mode.balance,
+      balance:
+        isBankLinkedPaymentMode(mode.type) ? bankBalanceMap[mode.bankAccount] || 0 : mode.balance,
     }));
 
     const netAccountBalance = totalIncome - totalExpense;
