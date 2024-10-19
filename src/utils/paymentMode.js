@@ -40,11 +40,19 @@ export const updatePaymentMode = async (paymentMode, amount, bankAccount) => {
 };
 
 export const updatePaymentModeAmount = async (paymentMode, type, amount, bankAccount) => {
-  const balanceToUpdate = type === TRANSACTION_TYPE.EXPENSE ? -amount : amount;
+  const balanceToUpdate = type === TRANSACTION_TYPE.INCOME ? amount : -amount;
   await updatePaymentMode(paymentMode, balanceToUpdate, bankAccount);
 };
 
 export const revertPaymentModeAmount = async (paymentMode, type, amount, bankAccount) => {
-  const balanceToUpdate = type === TRANSACTION_TYPE.EXPENSE ? amount : -amount;
+  const balanceToUpdate = type === TRANSACTION_TYPE.INCOME ? -amount : amount;
   await updatePaymentMode(paymentMode, balanceToUpdate, bankAccount);
+};
+
+export const addPaymentModeAmount = async (paymentMode, amount, bankAccount) => {
+  await updatePaymentMode(paymentMode, amount, bankAccount);
+};
+
+export const substractPaymentModeAmount = async (paymentMode, amount, bankAccount) => {
+  await updatePaymentMode(paymentMode, -amount, bankAccount);
 };

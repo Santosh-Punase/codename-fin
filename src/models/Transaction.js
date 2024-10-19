@@ -23,12 +23,17 @@ const TransactionSchema = new mongoose.Schema({
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true,
+    required: false,
     ref: 'Category',
   },
   paymentMode: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
+    ref: 'PaymentMode',
+  },
+  transferTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: false,
     ref: 'PaymentMode',
   },
   date: {

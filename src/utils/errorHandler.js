@@ -54,6 +54,11 @@ const transactionErrorHandler = (error) => {
         code: error.msg,
         message: VALIDATION_ERROR.INVALID_PAYMENT_MODE,
       });
+    case 'transferTo':
+      return ({
+        code: error.msg,
+        message: VALIDATION_ERROR.INVALID_PAYMENT_MODE,
+      });
     case 'type':
       return ({
         code: error.msg,

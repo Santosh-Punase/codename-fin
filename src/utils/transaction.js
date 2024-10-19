@@ -1,9 +1,10 @@
 import Transaction from '../models/Transaction.js';
 import { ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR } from '../const/errorMessages.js';
+import { TRANSACTION_TYPE } from '../config/contants.js';
 
 export const createTransaction = async ({
-  userId, amount, remark, type, date, categoryId, paymentModeId,
+  userId, amount, remark, type, date, categoryId, paymentModeId, transferToId,
 }) => {
   const transaction = new Transaction({
     user: userId,
@@ -13,6 +14,7 @@ export const createTransaction = async ({
     date,
     category: categoryId,
     paymentMode: paymentModeId,
+    transferTo: transferToId,
   });
 
   await transaction.save();
@@ -49,3 +51,7 @@ export const transactionErrorResponse = (errorMsg, defaultMsg) => {
 
   return errorResponse;
 };
+
+export const transactionContainsCategory = (t) => (
+  [TRANSACTION_TYPE.INCOME, TRANSACTION_TYPE.EXPENSE].includes(t)
+);

@@ -2,7 +2,7 @@ import { body, validationResult } from 'express-validator';
 
 import { VALIDATION_ERROR_CODES } from '../const/errorCodes.js';
 import { transactionErrorHandler } from '../utils/errorHandler.js';
-import { TRANSACTION_TYPES } from '../config/contants.js';
+import { TRANSACTION_TYPE, TRANSACTION_TYPES } from '../config/contants.js';
 
 const transactionValidationRules = [
   body('amount')
@@ -21,6 +21,7 @@ const transactionValidationRules = [
     .isIn(TRANSACTION_TYPES)
     .withMessage(VALIDATION_ERROR_CODES.TRANSACTION_TYPE_IS_INVALID),
   body('category')
+    .if((_value, { req }) => req.body.type !== TRANSACTION_TYPE.TRANSFER)
     .exists()
     .withMessage(VALIDATION_ERROR_CODES.CATEGORY_IS_REQUIRED)
     .isMongoId()
@@ -28,6 +29,12 @@ const transactionValidationRules = [
   body('paymentMode')
     .exists()
     .withMessage(VALIDATION_ERROR_CODES.PAYMENT_MODE_IS_REQUIRED)
+    .isMongoId()
+    .withMessage(VALIDATION_ERROR_CODES.INVALID_PAYMENT_MODE),
+  body('transferTo')
+    .if((_value, { req }) => req.body.type === TRANSACTION_TYPE.TRANSFER)
+    .exists()
+    .withMessage(VALIDATION_ERROR_CODES.TRANSFER_TO_IS_REQUIRED)
     .isMongoId()
     .withMessage(VALIDATION_ERROR_CODES.INVALID_PAYMENT_MODE),
 ];
