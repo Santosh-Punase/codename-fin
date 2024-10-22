@@ -2,7 +2,7 @@ import { body, validationResult } from 'express-validator';
 
 import { VALIDATION_ERROR_CODES } from '../const/errorCodes.js';
 import { categoryErrorHandler } from '../utils/errorHandler.js';
-import { CATEGORY_TYPES } from '../config/contants.js';
+import { CATEGORY_TYPE, CATEGORY_TYPES } from '../config/contants.js';
 
 const categoryValidationRules = [
   body('name')
@@ -11,6 +11,7 @@ const categoryValidationRules = [
     .custom((value) => typeof value === 'string' && !!value.trim())
     .withMessage(VALIDATION_ERROR_CODES.INVALID_CATEGORY_NAME),
   body('budget')
+    .if((_value, { req }) => req.body.type === CATEGORY_TYPE.EXPENSE)
     .custom((value) => !!value)
     .withMessage(VALIDATION_ERROR_CODES.BUDGET_IS_REQUIRED)
     .isNumeric()

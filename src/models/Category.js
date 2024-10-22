@@ -19,7 +19,7 @@ const categorySchema = new mongoose.Schema({
   },
   budget: {
     type: Number,
-    required: true,
+    required: false,
   },
   expenditure: {
     type: Number,

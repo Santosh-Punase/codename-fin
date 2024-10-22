@@ -61,7 +61,24 @@ describe('Category Routes', () => {
         .set('Authorization', token)
         .send({
           name: 'Entertainment',
+          budget: 400,
+        })
+        .end((_err, res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.error.code).to.equal(VALIDATION_ERROR_CODES.CATEGORY_TYPE_IS_REQUIRED);
+          expect(res.body.error.message).to.equal(VALIDATION_ERROR.INVALID_CATEGORY_TYPE);
+          done();
+        });
+    });
+
+    it('should Not add an INVALID category', (done) => {
+      server.request(app)
+        .post('/api/categories')
+        .set('Authorization', token)
+        .send({
+          name: 'Entertainment',
           budget: '',
+          type: CATEGORY_TYPE.EXPENSE,
         })
         .end((_err, res) => {
           expect(res).to.have.status(400);
