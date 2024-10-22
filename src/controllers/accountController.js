@@ -71,11 +71,18 @@ export const getAccountSummary = async (req, res) => {
       return map;
     }, {});
 
-    const paymentModeBalances = paymentModes.map((mode) => ({
-      name: mode.name,
-      balance:
-        isBankLinkedPaymentMode(mode.type) ? bankBalanceMap[mode.bankAccount] || 0 : mode.balance,
-    }));
+    let totalBalance = 0;
+    const paymentModeBalances = paymentModes.map((mode) => {
+      let bal = mode.balance;
+      if (isBankLinkedPaymentMode(mode.type)) {
+        bal = bankBalanceMap[mode.bankAccount] || 0;
+      }
+      totalBalance += bal;
+      return ({
+        name: mode.name,
+        balance: bal,
+      });
+    });
 
     const netAccountBalance = totalIncome - totalExpense;
 
@@ -83,6 +90,7 @@ export const getAccountSummary = async (req, res) => {
       totalIncome,
       totalExpense,
       netAccountBalance,
+      totalBalance,
       totalMonthlyBudget: totalBudget,
       totalMonthlyExpenditure: totalExpenditure,
       paymentModes: paymentModeBalances,
