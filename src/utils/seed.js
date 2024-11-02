@@ -21,7 +21,9 @@ export const defaultCategories = [
   },
 ];
 
+export const defaultBankAccount = { name: 'My Bank', balance: 0 };
+
 export const defaultPaymentModes = [
-  { type: 'Bank', name: 'Bank', balance: 0 },
+  { type: 'Bank', name: 'Online', balance: 0 },
   { type: 'Wallet', name: 'Cash', balance: 0 },
 ];
