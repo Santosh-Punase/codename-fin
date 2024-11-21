@@ -36,7 +36,7 @@ const ERROR = {
   SERVER_ERROR: 'Server error',
   USER_NOT_FOUND: 'User not found',
 
-  ACCOUNT_LOCKED_FOR_THE_DAY: 'Your account is frozen for the day. Please continue after 24 hours',
+  ACCOUNT_LOCKED_FOR_THE_DAY: 'Your account is frozen for the day.\nPlease continue after 24 hours',
   FAILED_TO_SEND_OTP: 'Failed to send OTP',
 
   ADD_TRANSACTION_FAILED: VALIDATION_ERROR.DEFAULT,
