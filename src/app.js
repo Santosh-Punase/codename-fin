@@ -11,6 +11,7 @@ import paymentModeRoutes from './routes/paymentModeRoutes.js';
 import bankAccountRoutes from './routes/bankAccountRoutes.js';
 import otpRoutes from './routes/otpRoutes.js';
 import accountRoutes from './routes/accountRoutes.js';
+import subscriptionRoutes from './routes/subscriptionRoutes.js';
 
 import limiter from './middleware/rateLimiter.js';
 import { CORS_DOMAIN } from './config/env.js';
@@ -46,5 +47,6 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/payment-modes', paymentModeRoutes);
 app.use('/api/bank-accounts', bankAccountRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 export default app;

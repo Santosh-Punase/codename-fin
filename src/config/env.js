@@ -16,3 +16,5 @@ export const { VERIFIER_MAIL_ID } = process.env;
 export const { VERIFIER_PASS } = process.env;
 export const { VERIFIER_PROVIDER } = process.env;
 export const { VERIFIER_PORT } = process.env;
+export const { PACKAGE_NAME } = process.env;
+export const { SERVICE_KEY } = process.env;
