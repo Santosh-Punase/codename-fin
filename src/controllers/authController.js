@@ -24,7 +24,7 @@ export const register = async (req, res) => {
     // Create default payment modes
     await initialiseWithDefaultPaymentModes(user._id);
 
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY || '1h' });
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
     logger.info(`New user created ${email}`);
     return res.status(201).json({ token });
   } catch (err) {
