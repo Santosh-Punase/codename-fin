@@ -17,8 +17,8 @@ import {
 } from '../config/env.js';
 
 const router = express.Router();
-console.log(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_ID);
-console.log(GOOGLE_CLIENT_SECRET, GOOGLE_CLIENT_SECRET);
+console.log('GOOGLE_CLIENT_ID', GOOGLE_CLIENT_ID);
+console.log('GOOGLE_CLIENT_SECRET', GOOGLE_CLIENT_SECRET);
 passport.use(
   new GoogleStrategy(
     {
@@ -48,6 +48,7 @@ router.get(
   passport.authenticate('google', { session: false }),
   (req, res) => {
     // Generate JWT token
+    console.log('rq.user', req.user);
     const token = jwt.sign({ id: req.user.id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRY,
     });
