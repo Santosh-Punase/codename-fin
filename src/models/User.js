@@ -34,7 +34,6 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
   },
   gender: {
     type: String,
@@ -48,6 +47,12 @@ const UserSchema = new mongoose.Schema({
     required: false,
   },
   reasons: {
+    type: String,
+  },
+  googleId: {
+    type: String,
+  },
+  picture: {
     type: String,
   },
 }, { timestamps: true });
