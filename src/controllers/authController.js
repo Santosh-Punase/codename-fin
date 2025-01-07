@@ -195,7 +195,9 @@ export const googleSignin = async (req, res) => {
     // Generate a JWT for the user (Sign-In or Sign-Up)
     const token = getToken(user._id);
 
-    return res.status(200).json({ token, isNewUser, username: user.username });
+    return res.status(200).json({
+      token, isNewUser, email, username: user.username,
+    });
   } catch (error) {
     console.error('Error during Google authentication:', error);
     return res.status(401).json({ error: 'Invalid Google token' });
