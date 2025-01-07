@@ -158,30 +158,38 @@ export const googleSignin = async (req, res) => {
     });
 
     const payload = ticket.getPayload();
-    const { sub: googleId } = payload;
+    const { sub: googleId, email } = payload;
 
     // Check if the user already exists in your database
-    let user = await User.findOne({ googleId }); // Unique Google user ID
+    const userWithGoogle = await User.findOne({ googleId }); // Unique Google user ID
+    const userWithEmail = await User.findOne({ email }); // Unique email
+    let user;
     let isNewUser = false;
-    let username = payload.given_name;
 
-    if (!user) {
-      isNewUser = true;
-      // User does not exist: Create a new user (Sign-Up)
-      user = await User.create({
-        googleId,
-        username,
-        email: payload.email,
-        picture: payload.picture,
-      });
+    if (!userWithGoogle) {
+      if (userWithEmail) {
+        userWithEmail.googleId = googleId;
+        userWithEmail.picture = payload.picture;
+        await userWithEmail.save();
+        user = userWithEmail;
+      } else {
+        isNewUser = true;
+        // User does not exist: Create a new user (Sign-Up)
+        user = await User.create({
+          googleId,
+          email,
+          username: payload.given_name,
+          picture: payload.picture,
+        });
+      }
     } else {
-      username = user.username;
+      user = userWithGoogle;
     }
 
     // Generate a JWT for the user (Sign-In or Sign-Up)
     const token = getToken(user._id);
 
-    return res.status(200).json({ token, isNewUser, username });
+    return res.status(200).json({ token, isNewUser, username: user.username });
   } catch (error) {
     console.error('Error during Google authentication:', error);
     return res.status(401).json({ error: 'Invalid Google token' });
