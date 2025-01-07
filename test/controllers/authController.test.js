@@ -93,6 +93,7 @@ describe('Auth Controller', () => {
       const mockUser = {
         _id: '123',
         email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
         matchPassword: sinon.stub().resolves(true),
       };
       User.findOne.resolves(mockUser);

@@ -15,6 +15,7 @@ import {
   initialiseWithDefaultPaymentModes, resetCategoriesExpenditure,
 } from '../utils/user.js';
 import { isBankLinkedPaymentMode } from '../utils/paymentMode.js';
+import DeletedUser from '../models/DeletedUser.js';
 
 export const getAccountSummary = async (req, res) => {
   try {
@@ -169,9 +170,14 @@ export const deleteAccount = async (req, res) => {
     await deleteAllCategories(userId);
     // await User.findByIdAndDelete(userId);
     const user = await User.findById(userId);
-    user.reasons = `${reasons.join(',')} ${additionalComment}`;
-
-    await user.save();
+    let deletedUser = await DeletedUser.findOne({ email: user.email });
+    if (!deletedUser) {
+      deletedUser = new DeletedUser({ email: user.email });
+    }
+    deletedUser.requestCount += 1;
+    deletedUser.reasons = `${reasons.join(',')} ${additionalComment}`;
+    deletedUser.save();
+    await User.deleteOne({ _id: userId });
 
     return res.status(200).json({ message: 'Account deleted successfully.' });
   } catch (err) {
