@@ -7,10 +7,10 @@ import { JWT_SECRET, JWT_EXPIRY, GOOGLE_CLIENT_ID } from '../config/env.js';
 import logger from '../utils/logger.js';
 import { ERROR_CODES, VALIDATION_ERROR_CODES } from '../const/errorCodes.js';
 import { ERROR, VALIDATION_ERROR } from '../const/errorMessages.js';
-// import {
-//   initialiseWithDefaultCategories,
-//   initialiseWithDefaultPaymentModes,
-// } from '../utils/user.js';
+import {
+  initialiseWithDefaultCategories,
+  initialiseWithDefaultPaymentModes,
+} from '../utils/user.js';
 
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -24,10 +24,10 @@ export const register = async (req, res) => {
     await user.save();
 
     // Create default categories
-    // await initialiseWithDefaultCategories(user._id);
+    await initialiseWithDefaultCategories(user._id);
 
     // Create default payment modes
-    // await initialiseWithDefaultPaymentModes(user._id);
+    await initialiseWithDefaultPaymentModes(user._id);
 
     const token = getToken(user._id);
     logger.info(`New user created ${email}`);
@@ -181,6 +181,12 @@ export const googleSignin = async (req, res) => {
           username: payload.given_name,
           picture: payload.picture,
         });
+
+        // Create default categories
+        await initialiseWithDefaultCategories(user._id);
+
+        // Create default payment modes
+        await initialiseWithDefaultPaymentModes(user._id);
       }
     } else {
       user = userWithGoogle;
