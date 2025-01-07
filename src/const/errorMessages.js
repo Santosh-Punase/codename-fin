@@ -3,6 +3,7 @@ const VALIDATION_ERROR = {
 
   INVALID_EMAIL: 'Please Enter a valid email',
   EMAIL_ALREADY_EXISTS: 'User already exists',
+  EMAIL_DOES_NOT_EXISTS: 'User does not exists',
   INVALID_PASSWORD_LENGTH: 'Password should be 6 to 12 characters',
   PASSWORD_DO_NOT_MATCH: 'Password do not match',
   USERNAME_IS_REQUIRED: 'Please Enter a username',

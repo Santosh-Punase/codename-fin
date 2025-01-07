@@ -8,7 +8,26 @@ import { ERROR, VALIDATION_ERROR } from '../const/errorMessages.js';
 import { generateOTP, generateToken, transporter } from '../utils/index.js';
 
 export const sendOtp = async (req, res) => {
-  const { email } = req.body;
+  const { email, flow } = req.body;
+  const user = await User.findOne({ email });
+
+  // 'forgotPassword' | 'signup'
+  if (flow === 'signup' && user) {
+    return res.status(400).json({
+      error: {
+        code: VALIDATION_ERROR_CODES.EMAIL_ALREADY_EXISTS,
+        message: VALIDATION_ERROR.EMAIL_ALREADY_EXISTS,
+      },
+    });
+  }
+  if (flow === 'forgotPassword' && !user) {
+    return res.status(400).json({
+      error: {
+        code: VALIDATION_ERROR_CODES.EMAIL_DOES_NOT_EXISTS,
+        message: VALIDATION_ERROR.EMAIL_DOES_NOT_EXISTS,
+      },
+    });
+  }
 
   const currentDate = new Date();
 
