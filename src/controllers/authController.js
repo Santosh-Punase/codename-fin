@@ -126,9 +126,11 @@ export const updateUser = async (req, res) => {
     return res.json({
       username: user.username,
       email: user.email,
-      currency: user.currency,
       gender: user.gender,
       birthDate: user.birthDate,
+      currency: user.currency,
+      googleId: user.googleId,
+      picture: user.picture,
     });
   } catch (err) {
     return res.status(500).json({
