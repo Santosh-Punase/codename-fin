@@ -20,4 +20,3 @@ export const { PACKAGE_NAME } = process.env;
 export const { SERVICE_KEY } = process.env;
 export const { GOOGLE_CLIENT_ID } = process.env;
 export const { GOOGLE_CLIENT_SECRET } = process.env;
-export const { CALLBACK_URL } = process.env;
